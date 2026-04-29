@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { useContext } from "react";
 
 // Context
@@ -13,10 +18,15 @@ import Home from "./pages/dashboard/home/Home";
 import About from "./pages/dashboard/home/About";
 import Contact from "./pages/dashboard/home/Contact";
 import AdminDashboard from "./pages/dashboard/admin/AdminDashboard";
+
+// --- New Admin Page Import ---
+import ManageStructure from "./pages/dashboard/admin/ManageStructure";
+
+// Farmer Pages
 import FarmerDashboard from "./pages/dashboard/farmer/FarmerDashboard";
 import Overviwe from "./pages/dashboard/farmer/Overview";
 import TunnelDesign from "./pages/dashboard/farmer/TunnelDesign";
-import ProfitCalculator from "./pages/dashboard/farmer/ProfitCalculator";
+// ProfitCalculator import එක අයින් කළා
 import AgroDoctor from "./pages/dashboard/farmer/AgroDoctor";
 
 /* ---------------- Protected Route ---------------- */
@@ -46,12 +56,10 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      
       <Route path="/" element={<Home user={user} />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
-      
-      
+
       {/* Auth Routes */}
       <Route
         path="/login"
@@ -61,7 +69,7 @@ const AppRoutes = () => {
       />
       <Route path="/register" element={<Register />} />
 
-      {/* Admin Dashboard */}
+      {/* ---------------- Admin Routes ---------------- */}
       <Route
         path="/admin-dashboard"
         element={
@@ -71,7 +79,16 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Farmer Dashboard */}
+      <Route
+        path="/manage-structure"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <ManageStructure />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ---------------- Farmer Routes ---------------- */}
       <Route
         path="/farmer-dashboard"
         element={
@@ -87,7 +104,7 @@ const AppRoutes = () => {
             <Overviwe />
           </ProtectedRoute>
         }
-      /> 
+      />
 
       <Route
         path="/tunnel-design"
@@ -97,14 +114,9 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/profit-calculator"
-        element={
-          <ProtectedRoute allowedRoles={["farmer"]}>
-            <ProfitCalculator />
-          </ProtectedRoute>
-        }
-      /> 
+
+      {/* Profit Calculator Route එක අයින් කළා */}
+
       <Route
         path="/agro-doctor"
         element={
@@ -113,7 +125,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-    </Routes> 
+    </Routes>
   );
 };
 
