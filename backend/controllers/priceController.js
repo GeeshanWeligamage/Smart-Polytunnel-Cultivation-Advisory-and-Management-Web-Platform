@@ -1,16 +1,15 @@
 import Price from "../models/Price.js";
+import axios from "axios"; // Required for making requests to the Python ML server
 
-// 1. බෝග වල තොරතුරු ලබා ගැනීම (දිනය අනුව Filter කිරීමේ හැකියාව සමඟ)
+// 1. Get crop prices (with optional date filtering)
 export const getPrices = async (req, res) => {
   try {
-    const { date } = req.query; // Frontend එකෙන් එවන ?date=... කොටස
+    const { date } = req.query;
     const allPrices = await Price.find().sort({ cropName: 1 });
 
     if (date) {
-      // තෝරාගත් දිනයට අදාළ මිල ගණන් පමණක් පෙරා ගැනීම (Filtering logic)
       const filteredPrices = allPrices
         .map((item) => {
-          // history array එක ඇතුළේ අදාළ දිනය තියෙනවද බලනවා
           const dayRecord = item.history.find((h) => h.date === date);
 
           if (dayRecord) {
@@ -19,20 +18,19 @@ export const getPrices = async (req, res) => {
               cropName: item.cropName,
               category: item.category,
               image: item.image,
-              priceMin: dayRecord.priceMin, // ඉතිහාසයෙන් අදාළ දවසේ අවම මිල
-              priceMax: dayRecord.priceMax, // ඉතිහාසයෙන් අදාළ දවසේ උපරිම මිල
+              priceMin: dayRecord.priceMin,
+              priceMax: dayRecord.priceMax,
               history: item.history,
               date: dayRecord.date,
             };
           }
           return null;
         })
-        .filter((item) => item !== null); // මිල ඇතුළත් කර නැති බෝග අයින් කරයි
+        .filter((item) => item !== null);
 
       return res.json(filteredPrices);
     }
 
-    // දිනයක් ලබා දී නැතිනම් සාමාන්‍ය පරිදි සියල්ල ලබා දීම
     res.json(allPrices);
   } catch (err) {
     res
@@ -41,7 +39,7 @@ export const getPrices = async (req, res) => {
   }
 };
 
-// 2. අලුත් බෝගයක් පද්ධතියට මුලින්ම ඇතුළත් කිරීම
+// 2. Add initial crop price
 export const addPrice = async (req, res) => {
   try {
     const { cropName, category, priceMin, priceMax, image } = req.body;
@@ -65,7 +63,7 @@ export const addPrice = async (req, res) => {
   }
 };
 
-// 3. දිනපතා මිල යාවත්කාලීන කිරීම
+// 3. Update daily price
 export const updateDailyPrice = async (req, res) => {
   const { cropName, date, priceMin, priceMax } = req.body;
 
@@ -74,7 +72,7 @@ export const updateDailyPrice = async (req, res) => {
     if (date > today) {
       return res
         .status(400)
-        .json({ message: "අනාගත දින සඳහා මිල ගණන් ඇතුළත් කළ නොහැක! ❌" });
+        .json({ message: "Cannot add prices for future dates! ❌" });
     }
 
     const priceRecord = await Price.findOne({ cropName: cropName });
@@ -103,7 +101,7 @@ export const updateDailyPrice = async (req, res) => {
   }
 };
 
-// 4. බෝගයක් මකා දැමීම
+// 4. Delete crop price
 export const deletePrice = async (req, res) => {
   try {
     const { id } = req.params;
@@ -116,63 +114,106 @@ export const deletePrice = async (req, res) => {
   }
 };
 
-// 5. ආදායම් පුරෝකථනය (Income Forecasting) සඳහා නව function එක
+// 5. Calculate Forecast Income using Python Machine Learning API
 export const calculateForecastIncome = async (req, res) => {
   try {
-    const { cropName, numberOfPlants } = req.body;
+    const { cropName, plantDate, numberOfPlants } = req.body;
 
-    const cropData = await Price.findOne({ cropName: cropName });
-
-    if (!cropData || !cropData.history || cropData.history.length === 0) {
-      return res.status(404).json({ message: "ප්‍රමාණවත් දත්ත නොමැත" });
+    // Validation: Currently, the ML model is trained specifically for Capsicum
+    if (cropName.toLowerCase() !== "capsicum") {
+      return res
+        .status(400)
+        .json({
+          message: "ML prediction is currently supported for Capsicum only.",
+        });
     }
 
-    // 1. එක පැළයකින් ලැබෙන අස්වැන්න පරාසය
-    let yieldPerPlantMin = 0;
-    let yieldPerPlantMax = 0;
-
-    if (cropName === "Capsicum") {
-      yieldPerPlantMin = 4; // කිලෝ 4
-      yieldPerPlantMax = 6; // කිලෝ 6
-    } else if (cropName === "Tomato") {
-      yieldPerPlantMin = 5;
-      yieldPerPlantMax = 8;
-    } else {
-      // වෙනත් බෝගයක් ආවොත් default අගයක්
-      yieldPerPlantMin = 3;
-      yieldPerPlantMax = 5;
+    if (!plantDate || !numberOfPlants) {
+      return res
+        .status(400)
+        .json({ message: "Plant date and number of plants are required." });
     }
 
-    // 2. මුළු අස්වැන්න පරාසය (Expected Harvest Range)
-    const expectedHarvestMin = numberOfPlants * yieldPerPlantMin;
-    const expectedHarvestMax = numberOfPlants * yieldPerPlantMax;
+    let harvestData = [];
+    let currentDate = new Date(plantDate);
 
-    // 3. Database එකෙන් සාමාන්‍ය මිල සෙවීම
-    const history = cropData.history;
-    let totalMinPrice = 0;
-    let totalMaxPrice = 0;
+    // 1st Harvest (After 45 days, 50g / 0.05kg per plant)
+    currentDate.setDate(currentDate.getDate() + 45);
+    harvestData.push({ date: new Date(currentDate), yieldPerPlantKg: 0.05 });
 
-    history.forEach((record) => {
-      totalMinPrice += record.priceMin;
-      totalMaxPrice += record.priceMax;
+    // 2nd Harvest (After 7 days, 50g / 0.05kg per plant)
+    currentDate.setDate(currentDate.getDate() + 7);
+    harvestData.push({ date: new Date(currentDate), yieldPerPlantKg: 0.05 });
+
+    // 3rd Harvest (After 7 days, 150g / 0.15kg per plant)
+    currentDate.setDate(currentDate.getDate() + 7);
+    harvestData.push({ date: new Date(currentDate), yieldPerPlantKg: 0.15 });
+
+    // Calculate end date (4 months from the 1st harvest)
+    let firstHarvestDate = new Date(harvestData[0].date);
+    let endHarvestDate = new Date(firstHarvestDate);
+    endHarvestDate.setMonth(endHarvestDate.getMonth() + 4);
+
+    // 4th Harvest onwards: Alternate 4 days and 3 days (200g / 0.20kg per plant)
+    let isFourDays = true;
+    while (true) {
+      currentDate.setDate(currentDate.getDate() + (isFourDays ? 4 : 3));
+
+      if (currentDate > endHarvestDate) {
+        break; // Stop when the 4-month duration is exceeded
+      }
+
+      harvestData.push({ date: new Date(currentDate), yieldPerPlantKg: 0.2 });
+      isFourDays = !isFourDays; // Toggle between 4 and 3 days
+    }
+
+    // Format dates for the Python API (Required format: YYYY-MM-DD)
+    const datesForAPI = harvestData.map(
+      (h) => h.date.toISOString().split("T")[0],
+    );
+
+    // Fetch predicted prices from Python ML Server
+    const pythonResponse = await axios.post("http://localhost:5001/predict", {
+      dates: datesForAPI,
     });
+    const pricePredictions = pythonResponse.data;
 
-    const avgMinPrice = totalMinPrice / history.length;
-    const avgMaxPrice = totalMaxPrice / history.length;
+    if (!pricePredictions || pricePredictions.length === 0) {
+      return res
+        .status(500)
+        .json({ message: "Failed to get predictions from ML server." });
+    }
 
-    // 4. ආදායම් පරාසය සෙවීම (Expected Income Range)
-    const expectedMinIncome = expectedHarvestMin * avgMinPrice;
-    const expectedMaxIncome = expectedHarvestMax * avgMaxPrice;
+    let totalMinIncome = 0;
+    let totalMaxIncome = 0;
 
+    // Calculate income for each predicted harvest day
+    for (let i = 0; i < harvestData.length; i++) {
+      const totalYieldKg = harvestData[i].yieldPerPlantKg * numberOfPlants;
+
+      const minPrice = pricePredictions[i].predicted_min_price;
+      const maxPrice = pricePredictions[i].predicted_max_price;
+
+      totalMinIncome += totalYieldKg * minPrice;
+      totalMaxIncome += totalYieldKg * maxPrice;
+    }
+
+    // Return the final formatted result to the Frontend
     res.json({
       cropName,
-      expectedHarvestMin,
-      expectedHarvestMax,
-      expectedMinIncome: expectedMinIncome.toFixed(2),
-      expectedMaxIncome: expectedMaxIncome.toFixed(2),
+      expectedMinIncome: totalMinIncome.toFixed(2),
+      expectedMaxIncome: totalMaxIncome.toFixed(2),
+      totalHarvests: harvestData.length,
+      message:
+        "Income calculated successfully using Time-Series Forecasting ML model.",
     });
   } catch (error) {
-    console.error("Forecast error:", error);
-    res.status(500).json({ message: "Server Error" });
+    console.error("ML Prediction Error:", error.message);
+    res
+      .status(500)
+      .json({
+        message:
+          "An error occurred while forecasting the income. Please ensure the Python server is running.",
+      });
   }
 };

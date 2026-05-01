@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import axios from "axios"; // 1. අනිවාර්යයෙන්ම axios import කරන්න
+import axios from "axios";
 import {
   TrendingUp,
   Wallet,
   Sprout,
-  AlertTriangle,
   Calculator,
   Ruler,
   Calendar,
@@ -14,46 +13,79 @@ import {
 const IncomeForecaster = () => {
   const [inputs, setInputs] = useState({
     tunnelSize: "",
-    crop: "Capsicum", // Default එක Capsicum විදිහටම තිබ්බා (Backend එකට යවන්න ලේසි වෙන්න)
+    crop: "Capsicum",
     plantCount: "",
     plantedDate: "",
   });
 
   const [isCalculated, setIsCalculated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [forecastResult, setForecastResult] = useState(null); // API එකෙන් එන දත්ත තියාගන්න
+  const [forecastResult, setForecastResult] = useState(null);
 
-  // වියදම් ගණනය කිරීම සඳහා (ඔයාගේ පරණ ලොජික් එකමයි)
+  // Expenses calculation
   const costPerPlant = 60;
   const totalExpenses = (inputs.plantCount || 0) * costPerPlant;
 
-  // Backend API එක Call කරන Function එක
+  // Calculate Total Expected Yield (Kg) based on harvest logic
+  let totalYieldKg = 0;
+  if (forecastResult && forecastResult.totalHarvests) {
+    const harvests = forecastResult.totalHarvests;
+    let yieldPerPlant = 0;
+
+    if (harvests >= 1) yieldPerPlant += 0.05; // 1st harvest: 50g
+    if (harvests >= 2) yieldPerPlant += 0.05; // 2nd harvest: 50g
+    if (harvests >= 3) yieldPerPlant += 0.15; // 3rd harvest: 150g
+    if (harvests > 3) yieldPerPlant += (harvests - 3) * 0.2; // 4th onwards: 200g
+
+    totalYieldKg = Math.round(yieldPerPlant * Number(inputs.plantCount));
+  }
+
+  // Function to call the Backend API
   const handleCalculate = async (e) => {
     e.preventDefault();
 
     if (!inputs.plantCount) {
-      alert("කරුණාකර පැළ ගණන ඇතුළත් කරන්න.");
+      alert("Please enter the number of plants.");
+      return;
+    }
+
+    if (!inputs.plantedDate) {
+      alert("Please select the planted date.");
       return;
     }
 
     setIsLoading(true);
     try {
-      // Backend එකට Request එක යැවීම - මෙතන URL එක නිවැරදි කළා
+      // Logging the exact payload being sent to the backend for debugging
+      console.log("Sending data to backend:", {
+        cropName: inputs.crop,
+        plantDate: inputs.plantedDate,
+        numberOfPlants: Number(inputs.plantCount),
+      });
+
+      // Sending the request to the backend with correct variable mappings
       const response = await axios.post(
         "http://localhost:5000/api/prices/calculate-income",
         {
           cropName: inputs.crop,
           numberOfPlants: Number(inputs.plantCount),
+          plantDate: inputs.plantedDate,
         },
       );
 
       setForecastResult(response.data);
       setIsCalculated(true);
     } catch (error) {
-      console.error("Error calculating forecast:", error);
-      alert(
-        "දත්ත ලබා ගැනීමේදී දෝෂයක් මතු විය. Backend එක Run වෙනවාදැයි පරීක්ෂා කරන්න.",
-      );
+      // Extracting the exact error message from the Node.js backend
+      if (error.response && error.response.data) {
+        console.error("Backend Error:", error.response.data.message);
+        alert(`Error: ${error.response.data.message}`);
+      } else {
+        console.error("Error calculating forecast:", error);
+        alert(
+          "Failed to fetch data. Please check if the backend server is running.",
+        );
+      }
     }
     setIsLoading(false);
   };
@@ -68,7 +100,6 @@ const IncomeForecaster = () => {
       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
         {title}
       </p>
-      {/* Range එක පෙන්වද්දී අකුරු ලොකු වැඩි නම් කැත වෙන නිසා text-xl දැම්මා */}
       <h3 className="text-xl font-black text-slate-800 tracking-tight">
         {value}
       </h3>
@@ -112,6 +143,7 @@ const IncomeForecaster = () => {
             <select
               className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 appearance-none cursor-pointer"
               onChange={(e) => setInputs({ ...inputs, crop: e.target.value })}
+              value={inputs.crop}
             >
               <option value="Capsicum">Capsicum</option>
               <option value="Tomato">Tomato</option>
@@ -164,35 +196,33 @@ const IncomeForecaster = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard
               title="Expected Revenue"
-              // API එකෙන් ආපු අවම සහ උපරිම ආදායම
-              value={`Rs. ${Number(forecastResult.expectedMinIncome).toLocaleString()} - ${Number(forecastResult.expectedMaxIncome).toLocaleString()}`}
+              value={`Rs. ${(Math.round(Number(forecastResult.expectedMinIncome) / 1000) * 1000).toLocaleString()} - ${(Math.round(Number(forecastResult.expectedMaxIncome) / 1000) * 1000).toLocaleString()}`}
               subValue="Projected gross income range"
               icon={TrendingUp}
               color="bg-emerald-500"
             />
             <StatCard
-              title="Yield Potential"
-              // API එකෙන් ආපු අවම සහ උපරිම අස්වැන්න
-              value={`${forecastResult.expectedHarvestMin} - ${forecastResult.expectedHarvestMax} Kg`}
-              subValue={`Total harvest for ${inputs.plantCount} plants`}
+              title="Total Expected Yield"
+              value={`${totalYieldKg.toLocaleString()} Kg`}
+              subValue={`Estimated yield from ${inputs.plantCount} plants`}
+              icon={Leaf}
+              color="bg-purple-500"
+            />
+            <StatCard
+              title="Harvest Rounds"
+              value={`${forecastResult.totalHarvests || 0} Times`}
+              subValue={`Total pickings for ${inputs.plantCount} plants`}
               icon={Sprout}
               color="bg-blue-500"
             />
             <StatCard
               title="Expected Expenses"
-              // වියදම් ගණනය කිරීම
               value={`Rs. ${totalExpenses.toLocaleString()}`}
               subValue={`Cost for ${inputs.plantCount} plants`}
               icon={Wallet}
               color="bg-amber-500"
             />
-            <StatCard
-              title="System Alert"
-              value="Stable"
-              subValue="Based on 6 months lifetime"
-              icon={AlertTriangle}
-              color="bg-rose-500"
-            />
+            
           </div>
         </div>
       )}
