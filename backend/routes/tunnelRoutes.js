@@ -39,4 +39,21 @@ router.delete("/configs/:id", async (req, res) => {
   }
 });
 
+// 4. Update the price of an existing configuration
+router.put("/configs/:id", async (req, res) => {
+  try {
+    const updatedConfig = await TunnelConfig.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: { pricePerSqft: req.body.pricePerSqft },
+      },
+      { new: true }, // This ensures it returns the newly updated data
+    );
+    res.json(updatedConfig);
+  } catch (err) {
+    console.error("Update Error:", err);
+    res.status(500).json(err);
+  }
+});
+
 export default router;

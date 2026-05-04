@@ -1,64 +1,111 @@
 import pandas as pd
-import numpy as np
-from prophet import Prophet
-from prophet.serialize import model_to_json
+import xgboost as xgb
+from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 import os
 
-print("1. Data load වෙමින් පවතී...")
+# Configuration
+TRAIN_FILE = 'Train_Dataset.csv'
+DATE_COL = 'Date Column'
+MIN_PRICE_COL = 'Min Price'
+MAX_PRICE_COL = 'Max Price'
+CROP_COL = 'Crop Name'
 
-if not os.path.exists('capsicum.csv'):
-    print("❌ Error: 'capsicum.csv' ෆයිල් එක ml-backend ෆෝල්ඩරයේ නැහැ!")
+if not os.path.exists(TRAIN_FILE):
+    print(f"Error: {TRAIN_FILE} not found. Please place the training dataset in the directory.")
     exit()
 
-df = pd.read_csv('capsicum.csv')
+print(f"Loading data from {TRAIN_FILE}...")
+df_train = pd.read_csv(TRAIN_FILE)
 
-try:
-    # Date එක හදාගැනීම
-    df['Date'] = pd.to_datetime(df['Date Column'])
+# Data Preprocessing
+df_train['ds'] = pd.to_datetime(df_train[DATE_COL], errors='coerce')
+df_train[MIN_PRICE_COL] = pd.to_numeric(df_train[MIN_PRICE_COL], errors='coerce')
+df_train[MAX_PRICE_COL] = pd.to_numeric(df_train[MAX_PRICE_COL], errors='coerce')
+df_train = df_train.dropna(subset=['ds', MIN_PRICE_COL, MAX_PRICE_COL, CROP_COL])
+
+# Sort by date strictly for Time-Series accuracy
+df_train = df_train.sort_values('ds')
+
+unique_crops = df_train[CROP_COL].unique()
+
+def create_features(df):
+    df = df.copy()
+    df['year'] = df['ds'].dt.year
+    df['month'] = df['ds'].dt.month
+    df['day'] = df['ds'].dt.day
+    df['dayofweek'] = df['ds'].dt.dayofweek
+    df['dayofyear'] = df['ds'].dt.dayofyear
+    return df
+
+FEATURES = ['year', 'month', 'day', 'dayofweek', 'dayofyear']
+
+def remove_outliers(df, column):
+    Q1 = df[column].quantile(0.25)
+    Q3 = df[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    return df[(df[column] >= lower_bound) & (df[column] <= upper_bound)].copy()
+
+def tune_and_train_xgb(train_df, target_col, save_path):
+    train_df = create_features(train_df)
+    X_train = train_df[FEATURES]
+    y_train = train_df[target_col]
+
+    xgb_model = xgb.XGBRegressor(random_state=42)
+
+    # Simplified Grid to prevent Overfitting
+    param_grid = {
+        'n_estimators': [50, 100, 150], # Reduced trees
+        'learning_rate': [0.05, 0.1],   
+        'max_depth': [3, 4, 5],         # Prevent deep memorization
+    }
+
+    print(f"      Running Time-Series GridSearchCV...")
     
-    # Min Price එක සහ Max Price එක වෙන වෙනම වෙන් කරගැනීම
-    df_min = df[['Date', 'Min Price']].rename(columns={'Date': 'ds', 'Min Price': 'y'})
-    df_max = df[['Date', 'Max Price']].rename(columns={'Date': 'ds', 'Max Price': 'y'})
-except KeyError as e:
-    print(f"❌ Error: CSV ෆයිල් එකේ column නම් වැරදියි: {e}")
-    exit()
+    # PRO FIX: Use TimeSeriesSplit instead of standard CV
+    tscv = TimeSeriesSplit(n_splits=3)
 
-print("2. Data Augmentation (දත්ත වැඩි කිරීම) ආරම්භ විය...")
+    grid_search = GridSearchCV(
+        estimator=xgb_model,
+        param_grid=param_grid,
+        scoring='neg_mean_absolute_error', 
+        cv=tscv, # Applied Time-Series CV
+        verbose=0,
+        n_jobs=-1 
+    )
 
-# දත්ත වැඩි කරන Function එක (Min සහ Max දෙකටම පාවිච්චි කරන්න පුළුවන් වෙන්න හැදුවා)
-def augment_data(data):
-    df_last_year = data.copy()
-    df_last_year['ds'] = df_last_year['ds'] - pd.DateOffset(years=1)
-    df_last_year['y'] = df_last_year['y'] * np.random.uniform(0.90, 0.95, len(data))
+    grid_search.fit(X_train, y_train)
 
-    df_2years_ago = data.copy()
-    df_2years_ago['ds'] = df_2years_ago['ds'] - pd.DateOffset(years=2)
-    df_2years_ago['y'] = df_2years_ago['y'] * np.random.uniform(0.80, 0.85, len(data))
+    print(f"      Best Parameters: {grid_search.best_params_}")
 
-    return pd.concat([df_2years_ago, df_last_year, data])
+    best_model = grid_search.best_estimator_
+    best_model.save_model(save_path)
 
-# Min සහ Max දත්ත දෙකම අවුරුදු 3කට වැඩි කිරීම
-final_df_min = augment_data(df_min)
-final_df_max = augment_data(df_max)
+for crop in unique_crops:
+    print("-" * 50)
+    print(f"🚀 Time-Series Tuning XGBoost Models for {crop.upper()}...")
+    
+    df_crop = df_train[df_train[CROP_COL] == crop].copy()
+    
+    if len(df_crop) < 30:
+        continue
 
-print("3. ML Models Train වෙමින් පවතී (Min සහ Max සඳහා වෙන වෙනම)...")
+    safe_crop_name = str(crop).strip().replace(" ", "_").lower()
+    min_model_path = f"{safe_crop_name}_xgb_min.json"
+    max_model_path = f"{safe_crop_name}_xgb_max.json"
 
-# Min Price සඳහා Model එක
-model_min = Prophet(yearly_seasonality=True, daily_seasonality=False)
-model_min.fit(final_df_min)
+    if crop.lower() == 'cucumber':
+        print("   -> Strategy: STABLE (No Outliers Removed)")
+        tune_and_train_xgb(df_crop, MIN_PRICE_COL, min_model_path)
+        tune_and_train_xgb(df_crop, MAX_PRICE_COL, max_model_path)
+    else:
+        print("   -> Strategy: VOLATILE (Outliers Removed)")
+        df_min = remove_outliers(df_crop[['ds', MIN_PRICE_COL]], MIN_PRICE_COL)
+        df_max = remove_outliers(df_crop[['ds', MAX_PRICE_COL]], MAX_PRICE_COL)
+        
+        tune_and_train_xgb(df_min, MIN_PRICE_COL, min_model_path)
+        tune_and_train_xgb(df_max, MAX_PRICE_COL, max_model_path)
 
-# Max Price සඳහා Model එක
-model_max = Prophet(yearly_seasonality=True, daily_seasonality=False)
-model_max.fit(final_df_max)
-
-print("4. Models Save කරමින් පවතී...")
-
-# Min Model එක Save කිරීම
-with open('prophet_model_min.json', 'w') as fout:
-    fout.write(model_to_json(model_min))
-
-# Max Model එක Save කිරීම
-with open('prophet_model_max.json', 'w') as fout:
-    fout.write(model_to_json(model_max))
-
-print("✅ සුබ පැතුම්! Min සහ Max Models දෙකම සාර්ථකව Train කර Save කරන ලදී!")
+print("-" * 50)
+print("✅ Time-Series Hybrid Models successfully trained!")

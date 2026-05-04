@@ -26,16 +26,26 @@ const IncomeForecaster = () => {
   const costPerPlant = 60;
   const totalExpenses = (inputs.plantCount || 0) * costPerPlant;
 
-  // Calculate Total Expected Yield (Kg) based on harvest logic
+  // Calculate Total Expected Yield (Kg) based on harvest logic for all 3 crops
   let totalYieldKg = 0;
   if (forecastResult && forecastResult.totalHarvests) {
     const harvests = forecastResult.totalHarvests;
     let yieldPerPlant = 0;
 
-    if (harvests >= 1) yieldPerPlant += 0.05; // 1st harvest: 50g
-    if (harvests >= 2) yieldPerPlant += 0.05; // 2nd harvest: 50g
-    if (harvests >= 3) yieldPerPlant += 0.15; // 3rd harvest: 150g
-    if (harvests > 3) yieldPerPlant += (harvests - 3) * 0.2; // 4th onwards: 200g
+    if (inputs.crop === "Capsicum") {
+      if (harvests >= 1) yieldPerPlant += 0.05;
+      if (harvests >= 2) yieldPerPlant += 0.05;
+      if (harvests >= 3) yieldPerPlant += 0.15;
+      if (harvests > 3) yieldPerPlant += (harvests - 3) * 0.2;
+    } else if (inputs.crop === "Cucumber") {
+      if (harvests >= 1) yieldPerPlant += 0.4;
+      if (harvests >= 2) yieldPerPlant += 0.6;
+      if (harvests > 2) yieldPerPlant += (harvests - 2) * 0.6;
+    } else if (inputs.crop === "Tomato") {
+      if (harvests >= 1) yieldPerPlant += 0.2;
+      if (harvests >= 2) yieldPerPlant += 0.25;
+      if (harvests > 2) yieldPerPlant += (harvests - 2) * 0.25;
+    }
 
     totalYieldKg = Math.round(yieldPerPlant * Number(inputs.plantCount));
   }
@@ -56,16 +66,14 @@ const IncomeForecaster = () => {
 
     setIsLoading(true);
     try {
-      // Logging the exact payload being sent to the backend for debugging
       console.log("Sending data to backend:", {
         cropName: inputs.crop,
         plantDate: inputs.plantedDate,
         numberOfPlants: Number(inputs.plantCount),
       });
 
-      // Sending the request to the backend with correct variable mappings
       const response = await axios.post(
-        "http://localhost:5000/api/prices/calculate-income",
+        "http://localhost:5001/api/prices/calculate-income",
         {
           cropName: inputs.crop,
           numberOfPlants: Number(inputs.plantCount),
@@ -76,7 +84,6 @@ const IncomeForecaster = () => {
       setForecastResult(response.data);
       setIsCalculated(true);
     } catch (error) {
-      // Extracting the exact error message from the Node.js backend
       if (error.response && error.response.data) {
         console.error("Backend Error:", error.response.data.message);
         alert(`Error: ${error.response.data.message}`);
@@ -146,6 +153,7 @@ const IncomeForecaster = () => {
               value={inputs.crop}
             >
               <option value="Capsicum">Capsicum</option>
+              <option value="Cucumber">Cucumber</option>
               <option value="Tomato">Tomato</option>
             </select>
           </div>
@@ -222,7 +230,6 @@ const IncomeForecaster = () => {
               icon={Wallet}
               color="bg-amber-500"
             />
-            
           </div>
         </div>
       )}

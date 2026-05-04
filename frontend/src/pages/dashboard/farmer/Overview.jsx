@@ -19,7 +19,7 @@ import {
   RefreshCcw,
 } from "lucide-react";
 
-// Path එක ඔයාගේ folder structure එකට අනුව සකසා ඇත
+
 import welcomeBg from "../../../assets/images/a4955356c52ab996e1804114bcd8cc0d.jpg";
 import visionImg from "../../../assets/images/WhatsApp Image 2026-04-27 at 12.07.28.jpeg";
 import missionImg from "../../../assets/images/WhatsApp Image 2026-04-27 at 12.07.28 (1).jpeg";
@@ -100,7 +100,7 @@ const Overview = ({ onNavigate }) => {
             alt="Vision"
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px] p-10 flex flex-col justify-start">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] p-10 flex flex-col justify-start">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 bg-white/10 rounded-full backdrop-blur-md text-white border border-white/20">
                 <Eye size={28} />
@@ -126,7 +126,7 @@ const Overview = ({ onNavigate }) => {
             alt="Mission"
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px] p-10 flex flex-col justify-start">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] p-10 flex flex-col justify-start">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 bg-emerald-500/10 rounded-full backdrop-blur-md text-emerald-400 border border-emerald-500/20">
                 <Target size={28} />
