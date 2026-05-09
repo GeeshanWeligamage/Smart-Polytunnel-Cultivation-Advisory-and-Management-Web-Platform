@@ -10,6 +10,15 @@ import {
   Info,
   Layout,
   ChevronDown,
+  Wind,
+  Droplets,
+  Settings,
+  ShieldCheck,
+  Construction,
+  Sun,
+  Maximize,
+  Layers,
+  Sprout,
 } from "lucide-react";
 import axios from "axios";
 
@@ -131,6 +140,9 @@ const TunnelDesign = () => {
 
   const BUFFER = 4;
 
+  // Defines the custom sorting order for types
+  const typeOrder = { Basic: 1, Moderate: 2, "High-Tech": 3 };
+
   useEffect(() => {
     const fetchConfigs = async () => {
       try {
@@ -142,6 +154,36 @@ const TunnelDesign = () => {
     };
     fetchConfigs();
   }, []);
+
+  const getIncludedItems = (type) => {
+    const baseItems = [
+      { name: "GI Pipes (Structure)", icon: <Construction size={16} /> },
+      { name: "Shade Net", icon: <Layers size={16} /> },
+      { name: "UV Polythine", icon: <Sun size={16} /> },
+      { name: "Insect Proof Net", icon: <ShieldCheck size={16} /> },
+    ];
+
+    if (type === "Moderate") {
+      return [
+        ...baseItems,
+        { name: "Exhaust Fans", icon: <Wind size={16} /> },
+        { name: "Cooling Pads", icon: <Droplets size={16} /> },
+      ];
+    }
+
+    if (type === "High-Tech") {
+      return [
+        ...baseItems,
+        { name: "Exhaust Fans", icon: <Wind size={16} /> },
+        { name: "Cooling Pads", icon: <Droplets size={16} /> },
+        { name: "Automation Systems", icon: <Settings size={16} /> },
+        { name: "Internal Fences", icon: <Maximize size={16} /> },
+        { name: "Supporting Yarns", icon: <Sprout size={16} /> },
+      ];
+    }
+
+    return baseItems;
+  };
 
   const processResult = (config) => {
     const estimatedWidth = Math.sqrt(config.size / 4);
@@ -155,7 +197,6 @@ const TunnelDesign = () => {
       mesh: (Math.sqrt(config.size) * 40).toFixed(0),
       arches: Math.ceil(estimatedLength / 10) + 1,
       cost: config.size * config.pricePerSqft,
-      showWarning: config.size >= 5000,
     });
   };
 
@@ -193,7 +234,11 @@ const TunnelDesign = () => {
       const initialSize = sizes[0];
       setSelectedSize(initialSize);
 
-      const filteredTypes = possible.filter((c) => c.size === initialSize);
+      // Filter and Sort types for the selected size
+      const filteredTypes = possible
+        .filter((c) => c.size === initialSize)
+        .sort((a, b) => (typeOrder[a.type] || 99) - (typeOrder[b.type] || 99));
+
       setTypesForSelectedSize(filteredTypes);
 
       const initialConfig = filteredTypes[0];
@@ -213,7 +258,10 @@ const TunnelDesign = () => {
   const onSizeChange = (size) => {
     const sizeVal = parseInt(size);
     setSelectedSize(sizeVal);
-    const filteredTypes = availableConfigs.filter((c) => c.size === sizeVal);
+    const filteredTypes = availableConfigs
+      .filter((c) => c.size === sizeVal)
+      .sort((a, b) => (typeOrder[a.type] || 99) - (typeOrder[b.type] || 99));
+
     setTypesForSelectedSize(filteredTypes);
     const firstType = filteredTypes[0];
     setSelectedType(firstType.type);
@@ -266,10 +314,6 @@ const TunnelDesign = () => {
                 value={land.length}
                 onChange={(e) => setLand({ ...land, length: e.target.value })}
                 onWheel={(e) => e.target.blur()}
-                onKeyDown={(e) =>
-                  (e.key === "ArrowUp" || e.key === "ArrowDown") &&
-                  e.preventDefault()
-                }
                 className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-5 font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all"
                 placeholder="0"
               />
@@ -283,10 +327,6 @@ const TunnelDesign = () => {
                 value={land.width}
                 onChange={(e) => setLand({ ...land, width: e.target.value })}
                 onWheel={(e) => e.target.blur()}
-                onKeyDown={(e) =>
-                  (e.key === "ArrowUp" || e.key === "ArrowDown") &&
-                  e.preventDefault()
-                }
                 className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-5 font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all"
                 placeholder="0"
               />
@@ -313,28 +353,30 @@ const TunnelDesign = () => {
         </form>
       </div>
 
-      {/* Recommendation Section */}
+      {/* Result Section */}
       <div ref={resultRef} className="scroll-mt-10">
         {result ? (
-          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm animate-in zoom-in duration-500 space-y-12">
-            {/* New Warning Notice Section */}
-            <div className="p-6 bg-amber-50 border border-amber-200 rounded-[1.5rem] flex items-start gap-4 shadow-sm">
-              <AlertCircle
-                className="text-amber-600 shrink-0 mt-0.5"
-                size={20}
-              />
-              <div className="space-y-1">
-                <h4 className="text-[10px] font-black text-amber-800 uppercase tracking-widest">
-                  Safety Advisory
-                </h4>
-                <p className="text-xs font-black text-amber-700 uppercase leading-relaxed">
-                  NOTICE: WE RECOMMEND STARTING WITH A MAX 2,500 SQFT STRUCTURE
-                  IF YOU ARE NEW TO THIS FIELD.
-                </p>
+          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm animate-in zoom-in duration-500 space-y-10">
+            {/* Warning - only for size > 2500 */}
+            {result.size > 2500 && (
+              <div className="p-6 bg-amber-50 border border-amber-200 rounded-[1.5rem] flex items-start gap-4 shadow-sm animate-in fade-in">
+                <AlertCircle
+                  className="text-amber-600 shrink-0 mt-0.5"
+                  size={20}
+                />
+                <div className="space-y-1">
+                  <h4 className="text-[10px] font-black text-amber-800 uppercase tracking-widest">
+                    Safety Advisory
+                  </h4>
+                  <p className="text-xs font-black text-amber-700 uppercase leading-relaxed">
+                    NOTICE: WE RECOMMEND STARTING WITH A MAX 2,500 SQFT
+                    STRUCTURE IF YOU ARE NEW TO THIS FIELD.
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="flex-1 space-y-10">
+            <div className="space-y-10">
               <h3 className="font-bold text-slate-800 flex items-center gap-3">
                 <CheckCircle2 className="text-emerald-500" size={22} />{" "}
                 Selection
@@ -387,10 +429,33 @@ const TunnelDesign = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Dynamic Components List */}
+              <div className="bg-slate-50/50 p-8 rounded-[2rem] border border-slate-100">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                  <Info size={14} className="text-blue-500" /> What's included
+                  in {selectedType} package:
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {getIncludedItems(selectedType).map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 bg-white p-3 px-4 rounded-xl border border-slate-100 shadow-sm animate-in fade-in slide-in-from-left-2 duration-300"
+                      style={{ animationDelay: `${idx * 50}ms` }}
+                    >
+                      <div className="text-emerald-500">{item.icon}</div>
+                      <span className="text-xs font-bold text-slate-700">
+                        {item.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-              <div className="bg-emerald-50/50 p-8 rounded-[2rem] border border-emerald-100/50 relative overflow-hidden group shadow-sm">
+            {/* Budget & Main Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-emerald-50/50 p-8 rounded-[2rem] border border-emerald-100/50 shadow-sm">
                 <p className="text-xs font-bold text-emerald-600 uppercase mb-2">
                   {result.type} Tier
                 </p>
@@ -408,38 +473,7 @@ const TunnelDesign = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center shadow-sm">
-                <Package size={22} className="mx-auto mb-3 text-slate-400" />
-                <p className="text-[10px] font-bold text-slate-500 uppercase">
-                  GI Pipes
-                </p>
-                <p className="text-2xl font-black text-slate-800">
-                  {result.arches}{" "}
-                  <span className="text-xs font-bold text-slate-400">Sets</span>
-                </p>
-              </div>
-              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center shadow-sm">
-                <div className="w-5 h-5 mx-auto mb-3 bg-blue-100 rounded-sm border border-blue-200"></div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase">
-                  UV Poly
-                </p>
-                <p className="text-2xl font-black text-slate-800">
-                  {result.poly}{" "}
-                  <span className="text-xs font-bold text-slate-400">FT²</span>
-                </p>
-              </div>
-              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center shadow-sm">
-                <div className="w-5 h-5 mx-auto mb-3 bg-emerald-100 rounded-sm border border-emerald-200"></div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase">
-                  Mesh
-                </p>
-                <p className="text-2xl font-black text-slate-800">
-                  {result.mesh}{" "}
-                  <span className="text-xs font-bold text-slate-400">FT²</span>
-                </p>
-              </div>
-            </div>
+            
           </div>
         ) : (
           <div className="bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-20 text-center flex flex-col items-center justify-center">

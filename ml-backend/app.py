@@ -89,8 +89,6 @@ def predict_price():
 
 # -------------------------------------------------------------------
 # 2. INCOME CALCULATOR API ROUTE
-# Calculates exact future harvest dates and predicts income based on 
-# real agricultural yield data and XGBoost price predictions.
 # -------------------------------------------------------------------
 @app.route('/api/prices/calculate-income', methods=['POST'])
 def calculate_income():
@@ -106,9 +104,7 @@ def calculate_income():
         plant_date = datetime.strptime(plant_date_str, '%Y-%m-%d')
         harvest_plan = []
         
-        # ---------------------------------------------------------------
         # CAPSICUM LOGIC
-        # ---------------------------------------------------------------
         if crop_name == "Capsicum":
             h1_date = plant_date + timedelta(days=45)
             end_date = h1_date + timedelta(days=120) 
@@ -140,9 +136,7 @@ def calculate_income():
                 
                 harvest_count += 1
 
-        # ---------------------------------------------------------------
         # CUCUMBER LOGIC
-        # ---------------------------------------------------------------
         elif crop_name == "Cucumber":
             h1_date = plant_date + timedelta(days=30)
             end_date = h1_date + timedelta(days=90)
@@ -161,9 +155,7 @@ def calculate_income():
                 current_date += timedelta(days=7)
                 harvest_count += 1
 
-        # ---------------------------------------------------------------
         # TOMATO LOGIC
-        # ---------------------------------------------------------------
         elif crop_name == "Tomato":
             h1_date = plant_date + timedelta(days=30)
             end_date = h1_date + timedelta(days=90)
@@ -185,9 +177,7 @@ def calculate_income():
         else:
             return jsonify({"message": f"Agricultural data for {crop_name} is not configured yet."}), 400
 
-        # ---------------------------------------------------------------
         # XGBOOST PRICE PREDICTION INTEGRATION
-        # ---------------------------------------------------------------
         if not harvest_plan:
             return jsonify({"message": "Could not generate harvest plan."}), 400
 
@@ -226,6 +216,55 @@ def calculate_income():
 
     except Exception as e:
         print("Income Calculation Backend Error:", str(e))
+        return jsonify({"message": "Internal server error occurred."}), 500
+
+# -------------------------------------------------------------------
+# 3. MARKET TRENDS API (For Chart)
+# -------------------------------------------------------------------
+@app.route('/api/prices/market-trends', methods=['POST'])
+def get_market_trends():
+    try:
+        data = request.get_json()
+        crop_name = data.get('cropName', 'Capsicum').strip()
+        
+        model_min = load_xgb_model(crop_name, 'min')
+        model_max = load_xgb_model(crop_name, 'max')
+        
+        if not model_min or not model_max:
+            return jsonify({"message": f"Models for {crop_name} not found."}), 404
+            
+        # Generate the next 7 days starting from today
+        base_date = pd.to_datetime('today')
+        dates = [base_date + timedelta(days=i) for i in range(7)]
+        
+        # Prepare features
+        df = pd.DataFrame({'ds': dates})
+        future_features = create_features(df)[FEATURES]
+        
+        # Predict prices
+        min_prices = model_min.predict(future_features)
+        max_prices = model_max.predict(future_features)
+        
+        trends_data = []
+        for i in range(7):
+            p1 = float(min_prices[i])
+            p2 = float(max_prices[i])
+            
+            # Ensure min is smaller than max
+            final_min = round(min(p1, p2))
+            final_max = round(max(p1, p2))
+            
+            date_str = dates[i].strftime("%b %d") # Formats like 'May 05'
+            trends_data.append({
+                "date": date_str,
+                "Min Price (Rs)": final_min,
+                "Max Price (Rs)": final_max
+            })
+            
+        return jsonify(trends_data)
+        
+    except Exception as e:
+        print("Market Trends Backend Error:", str(e))
         return jsonify({"message": "Internal server error occurred."}), 500
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 import React from "react";
+
 import {
   TrendingUp,
   ShieldAlert,
@@ -19,17 +20,18 @@ import {
   RefreshCcw,
 } from "lucide-react";
 
-
 import welcomeBg from "../../../assets/images/a4955356c52ab996e1804114bcd8cc0d.jpg";
+
 import visionImg from "../../../assets/images/WhatsApp Image 2026-04-27 at 12.07.28.jpeg";
+
 import missionImg from "../../../assets/images/WhatsApp Image 2026-04-27 at 12.07.28 (1).jpeg";
 
 const Overview = ({ onNavigate }) => {
   return (
     <div className="space-y-12 pb-20 animate-in fade-in duration-700 px-4 md:px-0">
-      {/* --- WELCOME SECTION (Tree widgets removed) --- */}
+      {/* --- WELCOME SECTION --- */}
+
       <section className="relative p-12 rounded-[3.5rem] text-white overflow-hidden shadow-xl shadow-emerald-600/20 min-h-[320px] flex items-center bg-emerald-700">
-        {/* Background Image Container */}
         <div className="absolute inset-0 z-0">
           <img
             src={welcomeBg}
@@ -39,7 +41,9 @@ const Overview = ({ onNavigate }) => {
               e.target.style.display = "none";
             }}
           />
-          {/* Overlay එකක් දැම්මා අකුරු ටික පිරිසිදුව පේන්න */}
+
+          {/* Dark overlay for better text readability */}
+
           <div className="absolute inset-0 bg-emerald-900/60 backdrop-blur-[1px]"></div>
         </div>
 
@@ -48,6 +52,7 @@ const Overview = ({ onNavigate }) => {
             <h2 className="text-4xl font-black mb-4 tracking-tight drop-shadow-lg">
               Welcome to SmartAgro
             </h2>
+
             <p className="text-emerald-50 font-bold text-lg leading-relaxed drop-shadow-md">
               At Smart Agro, we believe your hard work deserves the smartest
               insights. The market is waiting for your next harvest, with high
@@ -59,12 +64,14 @@ const Overview = ({ onNavigate }) => {
       </section>
 
       {/* --- SERVICES SECTION --- */}
+
       <section>
         <div className="flex flex-col mb-8">
           <h3 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
             Our Smart Services{" "}
             <div className="h-1 w-12 bg-emerald-500 rounded-full"></div>
           </h3>
+
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
             Advanced tools for your agricultural success
           </p>
@@ -77,12 +84,14 @@ const Overview = ({ onNavigate }) => {
             desc="Stay updated with the latest market rates for Capsicum, Tomato, and other crops."
             color="emerald"
           />
+
           <ServiceCard
             icon={<LineChart size={24} />}
             title="Income Forecaster"
             desc="Input your cultivation details and predict your future harvest income easily."
             color="blue"
           />
+
           <ServiceCard
             icon={<CalendarCheck size={24} />}
             title="Smart Planner"
@@ -93,6 +102,7 @@ const Overview = ({ onNavigate }) => {
       </section>
 
       {/* --- VISION & MISSION SECTION --- */}
+
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="relative h-80 rounded-[2.5rem] overflow-hidden group shadow-lg">
           <img
@@ -100,20 +110,24 @@ const Overview = ({ onNavigate }) => {
             alt="Vision"
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
+
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] p-10 flex flex-col justify-start">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 bg-white/10 rounded-full backdrop-blur-md text-white border border-white/20">
                 <Eye size={28} />
               </div>
+
               <h3 className="text-3xl font-black text-white tracking-tight">
                 Vision
               </h3>
             </div>
+
             <p className="text-emerald-50 text-lg font-bold leading-relaxed max-w-sm tracking-tight text-justify">
               To empower the farming community through data-driven innovation,
               ensuring a prosperous and sustainable future for local
               agriculture.
             </p>
+
             <div className="mt-auto opacity-20">
               <Sprout size={60} className="text-emerald-300" />
             </div>
@@ -126,15 +140,18 @@ const Overview = ({ onNavigate }) => {
             alt="Mission"
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
+
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] p-10 flex flex-col justify-start">
             <div className="flex items-center gap-4 mb-6">
               <div className="p-3 bg-emerald-500/10 rounded-full backdrop-blur-md text-emerald-400 border border-emerald-500/20">
                 <Target size={28} />
               </div>
+
               <h3 className="text-3xl font-black text-white tracking-tight">
                 Mission
               </h3>
             </div>
+
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <p className="text-slate-100 text-lg font-bold leading-relaxed max-w-md tracking-tight text-justify">
@@ -150,18 +167,24 @@ const Overview = ({ onNavigate }) => {
       </section>
 
       {/* --- ABOUT US SECTION --- */}
-      <section className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm relative overflow-hidden">
+
+      <section
+        id="about-us"
+        className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm relative overflow-hidden scroll-mt-10"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-4">
               Empowering the Future of Farming
             </h3>
+
             <p className="text-slate-500 font-bold text-sm leading-relaxed mb-6 text-justify">
               Our platform is dedicated to bridging the gap between traditional
               agriculture and modern technology. We provide farmers with
               data-driven insights to maximize yields.
             </p>
           </div>
+
           <div className="hidden lg:flex justify-center opacity-30">
             <Sprout size={180} className="text-emerald-100" />
           </div>
@@ -169,28 +192,36 @@ const Overview = ({ onNavigate }) => {
       </section>
 
       {/* --- CONTACT US SECTION --- */}
-      <section className="bg-slate-900 p-12 rounded-[3rem] text-white shadow-xl shadow-slate-900/10">
+
+      <section
+        id="contact-us"
+        className="bg-slate-900 p-12 rounded-[3rem] text-white shadow-xl shadow-slate-900/10 scroll-mt-10"
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div className="space-y-4">
             <h4 className="text-xl font-black mb-2 tracking-tight">
               Get in Touch
             </h4>
+
             <p className="text-slate-400 text-sm font-medium leading-relaxed">
               Have questions? We are here to help you.
             </p>
           </div>
+
           <div className="space-y-6">
             <ContactLink
               icon={<Phone size={18} />}
               title="Call Us"
               detail="+94 11 234 5678"
             />
+
             <ContactLink
               icon={<Mail size={18} />}
               title="Email"
               detail="support@smartagro.lk"
             />
           </div>
+
           <div className="space-y-6">
             <ContactLink
               icon={<MapPin size={18} />}
@@ -205,6 +236,7 @@ const Overview = ({ onNavigate }) => {
 };
 
 // --- Helper Components ---
+
 const ServiceCard = ({ icon, title, desc, color }) => (
   <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden">
     <div
@@ -212,9 +244,11 @@ const ServiceCard = ({ icon, title, desc, color }) => (
     >
       {icon}
     </div>
+
     <h4 className="text-lg font-black text-slate-800 mb-2 tracking-tight">
       {title}
     </h4>
+
     <p className="text-xs font-bold text-slate-400 leading-relaxed text-justify">
       {desc}
     </p>
@@ -224,10 +258,12 @@ const ServiceCard = ({ icon, title, desc, color }) => (
 const ContactLink = ({ icon, title, detail }) => (
   <div className="flex items-center gap-4 hover:-translate-y-0.5 transition-transform cursor-pointer">
     <div className="p-3 bg-slate-800 rounded-2xl text-emerald-500">{icon}</div>
+
     <div>
       <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">
         {title}
       </p>
+
       <p className="text-sm font-black text-white">{detail}</p>
     </div>
   </div>

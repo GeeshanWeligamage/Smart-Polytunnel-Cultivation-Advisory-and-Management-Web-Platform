@@ -9,6 +9,7 @@ import {
   CalendarDays,
   TrendingUp,
   BarChart3,
+  LineChart,
 } from "lucide-react";
 
 // --- Components Import ---
@@ -17,13 +18,36 @@ import SmartPlanner from "./TunnelDesign";
 import AgroDoctor from "./AgroDoctor";
 import DailyPrices from "./DailyPrices";
 import IncomeForecaster from "./IncomeForecaster";
+import MarketTrends from "./MarketTrends";
+import AboutUs from "./AboutUs";
 
 const FarmerDashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Sidebar Button Component
+  // Function to navigate to the Overview tab and scroll to a specific section
+  const scrollToSection = (sectionId) => {
+    if (activeTab !== "overview") {
+      // Switch to overview tab first if not already there
+      setActiveTab("overview");
+      // Delay scrolling slightly to allow the component to mount
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 150);
+    } else {
+      // Scroll directly if already on the overview tab
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
+  // Sidebar navigation item component
   const NavItem = ({ id, icon, label }) => (
     <button
       onClick={() => {
@@ -99,7 +123,7 @@ const FarmerDashboard = () => {
 
       {/* --- MAIN CONTENT --- */}
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-        {/* Header */}
+        {/* Header Section */}
         <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10">
           <div className="flex items-center gap-4">
             <button
@@ -112,17 +136,31 @@ const FarmerDashboard = () => {
               {activeTab === "overview" && "Dashboard Overview"}
               {activeTab === "planner" && "Crop Planner"}
               {activeTab === "forecaster" && "Income & Revenue Forecasting"}
+              {activeTab === "market-trends" && "Market Price Trends"}
               {activeTab === "agro-doctor" && "AI Disease Diagnosis"}
               {activeTab === "daily-prices" && "Real-time Market Prices"}
+              {activeTab === "about" && "About SmartAgro"}
             </h1>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-bold border border-emerald-100">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              Market Status: ONLINE
+          <div className="flex items-center gap-6">
+            {/* Navigation buttons for About and Contact */}
+            <div className="hidden md:flex items-center gap-4">
+              <button
+                onClick={() => setActiveTab("about")}
+                className="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors"
+              >
+                About Us
+              </button>
+              <button
+                onClick={() => scrollToSection("contact-us")}
+                className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold transition-colors"
+              >
+                Contact Us
+              </button>
             </div>
-            <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-white shadow-sm">
+
+            <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-white shadow-sm cursor-pointer">
               <img
                 src={`https://ui-avatars.com/api/?name=${
                   user?.username || "Farmer"
@@ -133,7 +171,7 @@ const FarmerDashboard = () => {
           </div>
         </header>
 
-        {/* Dynamic Content Area */}
+        {/* Scrollable Dynamic Content Area */}
         <div className="flex-1 overflow-y-auto p-6 md:p-8">
           <div className="max-w-6xl mx-auto">
             {activeTab === "overview" && <Overview onNavigate={setActiveTab} />}
@@ -141,11 +179,12 @@ const FarmerDashboard = () => {
             {activeTab === "forecaster" && <IncomeForecaster />}
             {activeTab === "agro-doctor" && <AgroDoctor />}
             {activeTab === "daily-prices" && <DailyPrices />}
+            {activeTab === "about" && <AboutUs />}
           </div>
         </div>
       </main>
 
-      {/* Overlay for mobile sidebar */}
+      {/* Mobile sidebar overlay */}
       {isSidebarOpen && (
         <div
           onClick={() => setIsSidebarOpen(false)}
