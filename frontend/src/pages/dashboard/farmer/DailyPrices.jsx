@@ -69,7 +69,7 @@ const DailyPrices = () => {
       `}</style>
 
       {/* Filter Bar */}
-      <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col lg:flex-row items-center justify-between gap-4">
+      <div data-aos="fade-down" className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col lg:flex-row items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
           {/* Date Picker */}
           <div className="relative">
@@ -120,9 +120,11 @@ const DailyPrices = () => {
         </div>
       ) : filteredPrices.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredPrices.map((item) => (
+          {filteredPrices.map((item, index) => (
             <div
               key={item._id}
+              data-aos="fade-up"
+              data-aos-delay={index * 50}
               className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-md transition-all group overflow-hidden flex flex-col"
             >
               <div className="h-40 overflow-hidden relative bg-slate-100">
@@ -161,7 +163,7 @@ const DailyPrices = () => {
         </div>
       ) : (
         /* Empty State */
-        <div className="bg-white rounded-[3rem] border-2 border-dashed border-slate-200 p-20 text-center flex flex-col items-center justify-center space-y-5 animate-in fade-in zoom-in duration-500">
+        <div data-aos="zoom-in" className="bg-white rounded-[3rem] border-2 border-dashed border-slate-200 p-20 text-center flex flex-col items-center justify-center space-y-5">
           <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
             <Clock size={40} />
           </div>

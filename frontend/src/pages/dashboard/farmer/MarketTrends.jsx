@@ -30,7 +30,7 @@ const MarketTrends = () => {
 
   return (
     <div className="space-y-8 pb-10">
-      <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+      <div data-aos="fade-down" className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white">
@@ -68,7 +68,7 @@ const MarketTrends = () => {
         </div>
       </div>
 
-      <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm">
+      <div data-aos="fade-up" data-aos-delay="100" className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm">
         <div className="flex items-center justify-between mb-8">
           <h4 className="text-lg font-black text-slate-800 flex items-center gap-2">
             <TrendingUp size={18} className="text-emerald-500" />
