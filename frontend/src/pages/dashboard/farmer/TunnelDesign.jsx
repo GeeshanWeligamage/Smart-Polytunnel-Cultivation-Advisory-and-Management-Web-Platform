@@ -111,7 +111,7 @@ const PolytunnelCanvas = ({ width, length }) => {
   }, [width, length]);
 
   return (
-    <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm mt-6 w-full animate-in fade-in duration-700">
+    <div data-aos="fade-up" className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm mt-6 w-full animate-in fade-in duration-700">
       <h4 className="font-black text-slate-800 mb-8 flex items-center gap-3 text-sm uppercase tracking-widest">
         <Layout size={20} className="text-emerald-500" /> Technical Structural
         Blueprint
@@ -283,7 +283,7 @@ const TunnelDesign = () => {
       `}</style>
 
       {/* Header */}
-      <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div data-aos="fade-down" className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
           <h2 className="text-2xl font-black tracking-tight uppercase">
             Smart Structure Planner
@@ -298,7 +298,7 @@ const TunnelDesign = () => {
       </div>
 
       {/* Input Section */}
-      <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+      <div data-aos="fade-up" data-aos-delay="100" className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
         <form onSubmit={handleCalculate} className="space-y-8">
           <h3 className="font-bold text-slate-800 flex items-center gap-3">
             <Ruler className="text-emerald-500" size={22} /> Land Dimensions
@@ -356,7 +356,7 @@ const TunnelDesign = () => {
       {/* Result Section */}
       <div ref={resultRef} className="scroll-mt-10">
         {result ? (
-          <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm animate-in zoom-in duration-500 space-y-10">
+          <div data-aos="fade-up" className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm animate-in zoom-in duration-500 space-y-10">
             {/* Warning - only for size > 2500 */}
             {result.size > 2500 && (
               <div className="p-6 bg-amber-50 border border-amber-200 rounded-[1.5rem] flex items-start gap-4 shadow-sm animate-in fade-in">
