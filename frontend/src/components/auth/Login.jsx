@@ -94,9 +94,9 @@ const Login = () => {
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-emerald-500/30 rounded-full blur-[100px] animate-pulse"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-500/30 rounded-full blur-[100px] animate-pulse"></div>
 
-      <div className="relative z-10 w-full max-w-md mx-4 animate-in zoom-in duration-500">
+      <div className="relative z-10 w-full max-w-sm mx-4 animate-in zoom-in duration-500">
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] shadow-2xl overflow-hidden">
-          <div className="px-8 pt-10 pb-6 text-center">
+          <div className="px-6 pt-8 pb-4 text-center">
             <Link
               to="/"
               className="inline-flex items-center gap-2 group cursor-pointer mb-6"
@@ -117,7 +117,7 @@ const Login = () => {
           </div>
 
           {/* Role Switcher Tabs */}
-          <div className="flex px-8 gap-4 mb-6">
+          <div className="flex px-6 gap-3 mb-5">
             <button
               type="button"
               onClick={() => setRole("farmer")}
@@ -134,8 +134,8 @@ const Login = () => {
             </button>
           </div>
 
-          <div className="px-8 pb-10 bg-white rounded-t-[2.5rem] pt-10">
-            <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="px-6 pb-8 bg-white rounded-t-[2rem] pt-8">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">
                   Username
