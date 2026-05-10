@@ -152,7 +152,7 @@ const InfoCard = ({ icon, title, desc, color }) => {
   };
 
   return (
-    <div className="p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow duration-300">
+    <div data-aos="fade-up" className="p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow duration-300">
       <div
         className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${styles[color]}`}
       >
@@ -167,7 +167,7 @@ const InfoCard = ({ icon, title, desc, color }) => {
 };
 
 const TeamMember = ({ name, role, image }) => (
-  <div className="bg-white p-6 rounded-[2rem] shadow-lg shadow-slate-200/50 border border-slate-100 flex items-center gap-5 hover:-translate-y-2 transition-transform duration-300">
+  <div data-aos="fade-up" className="bg-white p-6 rounded-[2rem] shadow-lg shadow-slate-200/50 border border-slate-100 flex items-center gap-5 hover:-translate-y-2 transition-transform duration-300">
     <img
       src={image}
       alt={name}

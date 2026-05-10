@@ -216,7 +216,7 @@ const FeatureCard = ({ icon, title, desc, color }) => {
   };
 
   return (
-    <div className="p-10 rounded-[3rem] bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-2xl hover:shadow-slate-200 hover:-translate-y-3 transition-all duration-500 group">
+    <div data-aos="fade-up" className="p-10 rounded-[3rem] bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-2xl hover:shadow-slate-200 hover:-translate-y-3 transition-all duration-500 group">
       <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center mb-10 transition-all duration-300 group-hover:text-white ${colorStyles[color]}`}>
         {icon}
       </div>
@@ -239,7 +239,7 @@ const CheckListItem = ({ text }) => (
 );
 
 const StatBox = ({ label, value, icon }) => (
-  <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors">
+  <div data-aos="zoom-in" className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors">
     <div className="text-emerald-400 mb-3">{icon}</div>
     <p className="text-3xl font-black mb-1">{value}</p>
     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</p>
