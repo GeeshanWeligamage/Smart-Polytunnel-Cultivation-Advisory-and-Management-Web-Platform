@@ -98,7 +98,7 @@ const IncomeForecaster = () => {
   };
 
   const StatCard = ({ title, value, subValue, icon: Icon, color }) => (
-    <div className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-md transition-all animate-in zoom-in duration-500">
+    <div data-aos="fade-up" className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-md transition-all">
       <div
         className={`w-12 h-12 rounded-2xl ${color} bg-opacity-10 flex items-center justify-center text-${color.split("-")[1]}-600 mb-4`}
       >
@@ -116,7 +116,7 @@ const IncomeForecaster = () => {
 
   return (
     <div className="space-y-8 pb-10">
-      <div className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm">
+      <div data-aos="fade-up" className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-emerald-600 rounded-2xl flex items-center justify-center text-white">
             <Calculator size={20} />
