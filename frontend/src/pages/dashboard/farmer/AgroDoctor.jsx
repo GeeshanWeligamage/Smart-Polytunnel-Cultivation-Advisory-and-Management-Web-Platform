@@ -66,7 +66,7 @@ const AgroDoctor = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+    <div data-aos="fade-up" className="space-y-8 pb-10">
        <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-black text-slate-800">Agro-Doctor AI Diagnosis</h2>
@@ -89,7 +89,7 @@ const AgroDoctor = () => {
       <div className="grid lg:grid-cols-2 gap-8 items-start">
         
         {/* --- LEFT SIDE: Upload / Image Preview Area --- */}
-        <div className="space-y-6">
+        <div data-aos="fade-right" data-aos-delay="100" className="space-y-6">
           
           {!imagePreview ? (
             // 1. Upload Placeholder
@@ -140,7 +140,7 @@ const AgroDoctor = () => {
         </div>
 
         {/* --- RIGHT SIDE: Diagnosis Report Area --- */}
-        <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 min-h-[400px] relative overflow-hidden">
+        <div data-aos="fade-left" data-aos-delay="200" className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 min-h-[400px] relative overflow-hidden">
           
           {result ? (
             // 1. Final Result View
