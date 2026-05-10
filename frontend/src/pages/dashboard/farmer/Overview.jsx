@@ -79,6 +79,8 @@ const Overview = ({ onNavigate }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <ServiceCard
+            data-aos="fade-up"
+            data-aos-delay="0"
             icon={<TrendingUp size={24} />}
             title="Daily Prices"
             desc="Stay updated with the latest market rates for Capsicum, Tomato, and other crops."
@@ -86,6 +88,8 @@ const Overview = ({ onNavigate }) => {
           />
 
           <ServiceCard
+            data-aos="fade-up"
+            data-aos-delay="100"
             icon={<LineChart size={24} />}
             title="Income Forecaster"
             desc="Input your cultivation details and predict your future harvest income easily."
@@ -93,6 +97,8 @@ const Overview = ({ onNavigate }) => {
           />
 
           <ServiceCard
+            data-aos="fade-up"
+            data-aos-delay="200"
             icon={<CalendarCheck size={24} />}
             title="Smart Planner"
             desc="Plan your planting schedule effectively by understanding seasonal demand."
@@ -104,7 +110,7 @@ const Overview = ({ onNavigate }) => {
       {/* --- VISION & MISSION SECTION --- */}
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="relative h-80 rounded-[2.5rem] overflow-hidden group shadow-lg">
+        <div data-aos="zoom-in" className="relative h-80 rounded-[2.5rem] overflow-hidden group shadow-lg">
           <img
             src={visionImg}
             alt="Vision"
@@ -134,7 +140,7 @@ const Overview = ({ onNavigate }) => {
           </div>
         </div>
 
-        <div className="relative h-80 rounded-[2.5rem] overflow-hidden group shadow-lg">
+        <div data-aos="zoom-in" data-aos-delay="100" className="relative h-80 rounded-[2.5rem] overflow-hidden group shadow-lg">
           <img
             src={missionImg}
             alt="Mission"
@@ -170,6 +176,7 @@ const Overview = ({ onNavigate }) => {
 
       <section
         id="about-us"
+        data-aos="fade-up"
         className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm relative overflow-hidden scroll-mt-10"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -195,6 +202,7 @@ const Overview = ({ onNavigate }) => {
 
       <section
         id="contact-us"
+        data-aos="fade-up"
         className="bg-slate-900 p-12 rounded-[3rem] text-white shadow-xl shadow-slate-900/10 scroll-mt-10"
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -237,8 +245,8 @@ const Overview = ({ onNavigate }) => {
 
 // --- Helper Components ---
 
-const ServiceCard = ({ icon, title, desc, color }) => (
-  <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden">
+const ServiceCard = ({ icon, title, desc, color, ...props }) => (
+  <div {...props} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden">
     <div
       className={`w-14 h-14 rounded-2xl bg-${color}-50 text-${color}-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
     >
