@@ -25,90 +25,341 @@ import axios from "axios";
 // --- Custom Blueprint Canvas Component ---
 const PolytunnelCanvas = ({ width, length }) => {
   const canvasRef = useRef(null);
+  const tunnelHeight = 12; // Standard polytunnel height in ft
+  const archSpacing = 10; // Spacing between arches in ft
+  const numArches = Math.ceil(Number(length) / archSpacing) + 1;
+
+  // Helper: draw a dimension line with arrows and label
+  const drawDimLine = (ctx, x1, y1, x2, y2, label, offset = 0, color = "#10b981") => {
+    const isHorizontal = Math.abs(y2 - y1) < 2;
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([]);
+
+    const arrowSize = 6;
+
+    if (isHorizontal) {
+      const oy = offset;
+      // extension lines
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x1, y1 + oy);
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2, y2 + oy);
+      ctx.stroke();
+      // main line
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1 + oy);
+      ctx.lineTo(x2, y2 + oy);
+      ctx.stroke();
+      // left arrow
+      ctx.beginPath();
+      ctx.moveTo(x1, y1 + oy);
+      ctx.lineTo(x1 + arrowSize, y1 + oy - arrowSize / 2);
+      ctx.lineTo(x1 + arrowSize, y1 + oy + arrowSize / 2);
+      ctx.closePath();
+      ctx.fill();
+      // right arrow
+      ctx.beginPath();
+      ctx.moveTo(x2, y2 + oy);
+      ctx.lineTo(x2 - arrowSize, y2 + oy - arrowSize / 2);
+      ctx.lineTo(x2 - arrowSize, y2 + oy + arrowSize / 2);
+      ctx.closePath();
+      ctx.fill();
+      // label
+      ctx.font = "bold 11px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#0f172a";
+      const midX = (x1 + x2) / 2;
+      const textY = y1 + oy + (oy >= 0 ? 14 : -10);
+      // label background
+      const tw = ctx.measureText(label).width + 12;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(midX - tw / 2, textY - 8, tw, 16);
+      ctx.fillStyle = color;
+      ctx.font = "800 11px Inter, sans-serif";
+      ctx.fillText(label, midX, textY);
+    } else {
+      const ox = offset;
+      // extension lines
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x1 + ox, y1);
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 + ox, y2);
+      ctx.stroke();
+      // main line
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x1 + ox, y1);
+      ctx.lineTo(x2 + ox, y2);
+      ctx.stroke();
+      // top arrow
+      ctx.beginPath();
+      ctx.moveTo(x1 + ox, y1);
+      ctx.lineTo(x1 + ox - arrowSize / 2, y1 + arrowSize);
+      ctx.lineTo(x1 + ox + arrowSize / 2, y1 + arrowSize);
+      ctx.closePath();
+      ctx.fill();
+      // bottom arrow
+      ctx.beginPath();
+      ctx.moveTo(x2 + ox, y2);
+      ctx.lineTo(x2 + ox - arrowSize / 2, y2 - arrowSize);
+      ctx.lineTo(x2 + ox + arrowSize / 2, y2 - arrowSize);
+      ctx.closePath();
+      ctx.fill();
+      // label
+      ctx.font = "800 11px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const midY = (y1 + y2) / 2;
+      const textX = x1 + ox + (ox >= 0 ? 16 : -16);
+      ctx.save();
+      ctx.translate(textX, midY);
+      ctx.rotate(-Math.PI / 2);
+      const tw = ctx.measureText(label).width + 12;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(-tw / 2, -8, tw, 16);
+      ctx.fillStyle = color;
+      ctx.fillText(label, 0, 0);
+      ctx.restore();
+    }
+    ctx.restore();
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.lineWidth = 2;
-    ctx.font = "bold 11px Inter, sans-serif";
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const cW = rect.width;
+    const cH = rect.height;
+    ctx.clearRect(0, 0, cW, cH);
+
+    // --- SECTION SPACING ---
+    const sectionWidth = (cW - 80) / 3;
+    const margin = 20;
+
+    // ===========================
+    // 1. TOP VIEW (PLAN)
+    // ===========================
+    const topX = margin + 30;
+    const topY = 65;
+    const topW = sectionWidth - 60;
+    const topH = topW * 0.45;
+
+    // Title
+    ctx.font = "800 10px Inter, sans-serif";
     ctx.textAlign = "center";
+    ctx.fillStyle = "#64748b";
+    ctx.fillText("TOP VIEW (PLAN)", topX + topW / 2, topY - 30);
 
-    const cW = canvas.width;
-
-    const topW = cW * 0.25;
-    const topH = 100;
-    const topX = 50;
-    const topY = 80;
-    ctx.strokeStyle = "#1e293b";
-    ctx.fillStyle = "rgba(186, 230, 253, 0.3)";
+    // Main rectangle fill
+    ctx.fillStyle = "rgba(186, 230, 253, 0.25)";
+    ctx.strokeStyle = "#334155";
+    ctx.lineWidth = 2;
     ctx.fillRect(topX, topY, topW, topH);
     ctx.strokeRect(topX, topY, topW, topH);
-    ctx.strokeStyle = "#cbd5e1";
-    for (let i = 1; i < 6; i++) {
-      const archX = topX + (topW * i) / 6;
+
+    // Arch lines (dashed)
+    ctx.strokeStyle = "#94a3b8";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    for (let i = 1; i < numArches - 1; i++) {
+      const ax = topX + (topW * i) / (numArches - 1);
       ctx.beginPath();
-      ctx.moveTo(archX, topY);
-      ctx.lineTo(archX, topY + topH);
+      ctx.moveTo(ax, topY);
+      ctx.lineTo(ax, topY + topH);
       ctx.stroke();
     }
-    ctx.fillStyle = "#64748b";
-    ctx.fillText("TOP VIEW (PLAN)", topX + topW / 2, topY - 20);
-    ctx.fillStyle = "#0f172a";
-    ctx.fillText(`${length} ft`, topX + topW / 2, topY + topH + 20);
+    ctx.setLineDash([]);
 
-    const frontW = 120;
-    const frontH = 60;
-    const frontX = topX + topW + 80;
-    const frontY = topY + topH - frontH;
-    ctx.strokeStyle = "#94a3b8";
+    // Arch count label
+    ctx.font = "600 9px Inter, sans-serif";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText(`${numArches} arches @ ${archSpacing} ft spacing`, topX + topW / 2, topY + topH / 2 + 4);
+
+    // Dimension: Length (bottom)
+    drawDimLine(ctx, topX, topY + topH, topX + topW, topY + topH, `${length} ft (Length)`, 22, "#10b981");
+    // Dimension: Width (left side)
+    drawDimLine(ctx, topX, topY, topX, topY + topH, `${width} ft (W)`, -28, "#3b82f6");
+
+    // ===========================
+    // 2. FRONT VIEW (CROSS SECTION)
+    // ===========================
+    const frontCX = margin + sectionWidth + sectionWidth / 2;
+    const frontW = sectionWidth * 0.5;
+    const frontH = frontW * 0.55;
+    const frontBaseY = topY + topH + 10;
+    const frontX = frontCX - frontW / 2;
+    const frontTopY = frontBaseY - frontH;
+
+    // Title
+    ctx.font = "800 10px Inter, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#64748b";
+    ctx.fillText("FRONT VIEW (CROSS SECTION)", frontCX, topY - 30);
+
+    // Ground line
+    ctx.strokeStyle = "#78716c";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([]);
     ctx.beginPath();
-    ctx.moveTo(frontX - 20, frontY + frontH);
-    ctx.lineTo(frontX + frontW + 20, frontY + frontH);
+    ctx.moveTo(frontX - 25, frontBaseY);
+    ctx.lineTo(frontX + frontW + 25, frontBaseY);
     ctx.stroke();
+    // Ground hatch
+    ctx.strokeStyle = "#d6d3d1";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 8; i++) {
+      const hx = frontX - 20 + i * 20;
+      ctx.beginPath();
+      ctx.moveTo(hx, frontBaseY);
+      ctx.lineTo(hx - 8, frontBaseY + 8);
+      ctx.stroke();
+    }
+
+    // Arch shape (semi-ellipse)
     ctx.beginPath();
-    ctx.moveTo(frontX, frontY + frontH);
+    ctx.moveTo(frontX, frontBaseY);
     ctx.bezierCurveTo(
-      frontX,
-      frontY - 10,
-      frontX + frontW,
-      frontY - 10,
-      frontX + frontW,
-      frontY + frontH,
+      frontX, frontTopY - frontH * 0.15,
+      frontX + frontW, frontTopY - frontH * 0.15,
+      frontX + frontW, frontBaseY
     );
-    ctx.fillStyle = "rgba(167, 243, 208, 0.4)";
+    ctx.fillStyle = "rgba(167, 243, 208, 0.3)";
     ctx.fill();
     ctx.strokeStyle = "#10b981";
+    ctx.lineWidth = 2.5;
     ctx.stroke();
-    ctx.fillStyle = "#64748b";
-    ctx.fillText(
-      "SIDE VIEW (FRONT)",
-      frontX + frontW / 2,
-      frontY + frontH + 20,
-    );
 
-    const sideViewW = 180;
-    const sideViewH = 60;
-    const sideViewX = frontX + frontW + 80;
-    const sideViewY = topY + topH - sideViewH;
-    ctx.strokeStyle = "#94a3b8";
+    // Vertical center dashed line
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
     ctx.beginPath();
-    ctx.moveTo(sideViewX - 20, sideViewY + sideViewH);
-    ctx.lineTo(sideViewX + sideViewW + 20, sideViewY + sideViewH);
+    ctx.moveTo(frontCX, frontBaseY);
+    ctx.lineTo(frontCX, frontTopY - frontH * 0.08);
     ctx.stroke();
-    ctx.fillStyle = "rgba(203, 213, 225, 0.3)";
-    ctx.fillRect(sideViewX, sideViewY, sideViewW, sideViewH);
-    ctx.strokeStyle = "#1e293b";
-    ctx.strokeRect(sideViewX, sideViewY, sideViewW, sideViewH);
+    ctx.setLineDash([]);
+
+    // Dimension: Width (bottom)
+    drawDimLine(ctx, frontX, frontBaseY, frontX + frontW, frontBaseY, `${width} ft (Width)`, 22, "#3b82f6");
+    // Dimension: Height (right side)
+    const archPeakY = frontTopY - frontH * 0.08;
+    drawDimLine(ctx, frontX + frontW, archPeakY, frontX + frontW, frontBaseY, `${tunnelHeight} ft (H)`, 28, "#f59e0b");
+
+    // ===========================
+    // 3. SIDE VIEW (ELEVATION)
+    // ===========================
+    const sideX = margin + sectionWidth * 2 + 30;
+    const sideW = sectionWidth - 60;
+    const sideH = sideW * 0.35;
+    const sideBaseY = frontBaseY;
+    const sideTopY = sideBaseY - sideH;
+
+    // Title
+    ctx.font = "800 10px Inter, sans-serif";
+    ctx.textAlign = "center";
     ctx.fillStyle = "#64748b";
-    ctx.fillText(
-      "SIDE VIEW (SIDE)",
-      sideViewX + sideViewW / 2,
-      sideViewY + sideViewH + 20,
+    ctx.fillText("SIDE VIEW (ELEVATION)", sideX + sideW / 2, topY - 30);
+
+    // Ground line
+    ctx.strokeStyle = "#78716c";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(sideX - 20, sideBaseY);
+    ctx.lineTo(sideX + sideW + 20, sideBaseY);
+    ctx.stroke();
+    // Ground hatch
+    ctx.strokeStyle = "#d6d3d1";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 10; i++) {
+      const hx = sideX - 15 + i * 20;
+      ctx.beginPath();
+      ctx.moveTo(hx, sideBaseY);
+      ctx.lineTo(hx - 8, sideBaseY + 8);
+      ctx.stroke();
+    }
+
+    // Main body rectangle
+    ctx.fillStyle = "rgba(203, 213, 225, 0.2)";
+    ctx.fillRect(sideX, sideTopY, sideW, sideH);
+    ctx.strokeStyle = "#334155";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(sideX, sideTopY, sideW, sideH);
+
+    // Arch top curve
+    ctx.beginPath();
+    ctx.moveTo(sideX, sideTopY);
+    ctx.bezierCurveTo(
+      sideX + sideW * 0.1, sideTopY - sideH * 0.25,
+      sideX + sideW * 0.9, sideTopY - sideH * 0.25,
+      sideX + sideW, sideTopY
     );
-  }, [width, length]);
+    ctx.fillStyle = "rgba(167, 243, 208, 0.2)";
+    ctx.fill();
+    ctx.strokeStyle = "#10b981";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Vertical arch lines inside
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    for (let i = 1; i < numArches - 1; i++) {
+      const ax = sideX + (sideW * i) / (numArches - 1);
+      ctx.beginPath();
+      ctx.moveTo(ax, sideTopY);
+      ctx.lineTo(ax, sideBaseY);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // Dimension: Length (bottom)
+    drawDimLine(ctx, sideX, sideBaseY, sideX + sideW, sideBaseY, `${length} ft (Length)`, 22, "#10b981");
+    // Dimension: Height (left side)
+    drawDimLine(ctx, sideX, sideTopY, sideX, sideBaseY, `${tunnelHeight} ft (H)`, -28, "#f59e0b");
+
+    // ===========================
+    // LEGEND
+    // ===========================
+    const legendY = cH - 18;
+    ctx.font = "700 9px Inter, sans-serif";
+    ctx.textAlign = "left";
+    const legendItems = [
+      { color: "#10b981", label: "Length" },
+      { color: "#3b82f6", label: "Width" },
+      { color: "#f59e0b", label: "Height" },
+    ];
+    let lx = margin + 10;
+    legendItems.forEach((item) => {
+      ctx.fillStyle = item.color;
+      ctx.fillRect(lx, legendY - 4, 12, 8);
+      ctx.fillStyle = "#64748b";
+      ctx.fillText(item.label, lx + 16, legendY + 3);
+      lx += ctx.measureText(item.label).width + 36;
+    });
+
+    // Specs summary on right
+    ctx.textAlign = "right";
+    ctx.font = "700 9px Inter, sans-serif";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText(
+      `${length}L × ${width}W × ${tunnelHeight}H ft  |  ${numArches} Arches  |  ${Number(length) * Number(width)} sqft`,
+      cW - margin - 10,
+      legendY + 3
+    );
+  }, [width, length, numArches]);
 
   return (
     <div data-aos="fade-up" className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm mt-6 w-full animate-in fade-in duration-700">
@@ -116,8 +367,8 @@ const PolytunnelCanvas = ({ width, length }) => {
         <Layout size={20} className="text-emerald-500" /> Technical Structural
         Blueprint
       </h4>
-      <div className="bg-slate-50 rounded-[2rem] p-10 border border-slate-100 h-[350px] overflow-x-auto shadow-inner">
-        <canvas ref={canvasRef} className="w-full h-full min-w-[800px]" />
+      <div className="bg-slate-50 rounded-[2rem] p-6 border border-slate-100 h-[380px] overflow-x-auto shadow-inner">
+        <canvas ref={canvasRef} className="w-full h-full min-w-[900px]" />
       </div>
     </div>
   );
@@ -337,19 +588,37 @@ const TunnelDesign = () => {
               ⚠️ {error}
             </div>
           )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white p-5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98]"
-          >
-            {loading ? (
-              "Processing..."
-            ) : (
-              <>
-                Generate Comprehensive Plan <ArrowRight size={20} />
-              </>
-            )}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white p-5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98]"
+            >
+              {loading ? (
+                "Processing..."
+              ) : (
+                <>
+                  Generate Comprehensive Plan <ArrowRight size={20} />
+                </>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setResult(null);
+                setLand({ length: "", width: "" });
+                setError("");
+                setSelectedSize("");
+                setSelectedType("");
+                setAvailableConfigs([]);
+                setUniqueSizes([]);
+                setTypesForSelectedSize([]);
+              }}
+              className="sm:w-auto bg-white hover:bg-slate-50 text-slate-500 hover:text-red-500 p-5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all border-2 border-slate-100 hover:border-red-200 active:scale-[0.98]"
+            >
+              <RotateCcw size={18} /> Reset Plan
+            </button>
+          </div>
         </form>
       </div>
 

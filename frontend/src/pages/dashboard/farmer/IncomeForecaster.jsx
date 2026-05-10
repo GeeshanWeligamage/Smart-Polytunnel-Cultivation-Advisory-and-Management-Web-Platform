@@ -8,6 +8,7 @@ import {
   Ruler,
   Calendar,
   Leaf,
+  RotateCcw,
 } from "lucide-react";
 
 const IncomeForecaster = () => {
@@ -136,6 +137,7 @@ const IncomeForecaster = () => {
               type="number"
               placeholder="e.g. 1000"
               required
+              value={inputs.tunnelSize}
               className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               onChange={(e) =>
                 setInputs({ ...inputs, tunnelSize: e.target.value })
@@ -166,6 +168,7 @@ const IncomeForecaster = () => {
               type="number"
               placeholder="e.g. 400"
               required
+              value={inputs.plantCount}
               className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               onChange={(e) =>
                 setInputs({ ...inputs, plantCount: e.target.value })
@@ -180,6 +183,7 @@ const IncomeForecaster = () => {
             <input
               type="date"
               required
+              value={inputs.plantedDate}
               className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer uppercase"
               onChange={(e) =>
                 setInputs({ ...inputs, plantedDate: e.target.value })
@@ -187,13 +191,24 @@ const IncomeForecaster = () => {
             />
           </div>
 
-          <div className="lg:col-span-4 mt-4">
+          <div className="lg:col-span-4 mt-4 flex flex-col sm:flex-row gap-4">
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full md:w-auto bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-2 disabled:bg-emerald-400"
+              className="flex-1 md:flex-none bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-2 disabled:bg-emerald-400"
             >
               {isLoading ? "Calculating..." : "Calculate Prediction"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setInputs({ tunnelSize: "", crop: "Capsicum", plantCount: "", plantedDate: "" });
+                setIsCalculated(false);
+                setForecastResult(null);
+              }}
+              className="bg-white hover:bg-slate-50 text-slate-500 hover:text-red-500 px-8 py-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all border-2 border-slate-100 hover:border-red-200 active:scale-[0.98]"
+            >
+              <RotateCcw size={18} /> Reset Prediction
             </button>
           </div>
         </form>

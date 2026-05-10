@@ -1,4 +1,5 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import AOS from "aos";
 import { AuthContext } from "../../../context/AuthContext";
 import {
   LayoutDashboard,
@@ -25,6 +26,10 @@ const FarmerDashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    AOS.refresh();
+  }, [activeTab]);
 
   // Function to navigate to the Overview tab and scroll to a specific section
   const scrollToSection = (sectionId) => {
@@ -193,13 +198,25 @@ const FarmerDashboard = () => {
         </div>
 
         <div className="max-w-[1400px] mx-auto p-6 md:p-8 pt-4">
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {activeTab === "overview" && <Overview onNavigate={setActiveTab} />}
-            {activeTab === "planner" && <SmartPlanner />}
-            {activeTab === "forecaster" && <IncomeForecaster />}
-            {activeTab === "agro-doctor" && <AgroDoctor />}
-            {activeTab === "daily-prices" && <DailyPrices />}
-            {activeTab === "about" && <AboutUs />}
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
+            <div className={activeTab === "overview" ? "block" : "hidden"}>
+              <Overview onNavigate={setActiveTab} />
+            </div>
+            <div className={activeTab === "planner" ? "block" : "hidden"}>
+              <SmartPlanner />
+            </div>
+            <div className={activeTab === "forecaster" ? "block" : "hidden"}>
+              <IncomeForecaster />
+            </div>
+            <div className={activeTab === "agro-doctor" ? "block" : "hidden"}>
+              <AgroDoctor />
+            </div>
+            <div className={activeTab === "daily-prices" ? "block" : "hidden"}>
+              <DailyPrices />
+            </div>
+            <div className={activeTab === "about" ? "block" : "hidden"}>
+              <AboutUs />
+            </div>
           </div>
         </div>
       </main>
