@@ -4,7 +4,9 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 // Context
 import { AuthContext, AuthProvider } from "./context/AuthContext";
@@ -131,6 +133,14 @@ const AppRoutes = () => {
 
 /* ---------------- Main App ---------------- */
 const App = () => {
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 100,
+    });
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
