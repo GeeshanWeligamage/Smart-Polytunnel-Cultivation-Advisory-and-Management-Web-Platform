@@ -66,7 +66,7 @@ const FarmerDashboard = () => {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-slate-50 font-sans text-slate-900">
       {/* --- TOP NAVIGATION BAR --- */}
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/60 shadow-sm">
         <div className="w-full px-6 md:px-8 h-20 flex items-center justify-between gap-4">
@@ -179,7 +179,7 @@ const FarmerDashboard = () => {
       )}
 
       {/* --- MAIN CONTENT AREA --- */}
-      <main className="flex-1 overflow-y-auto relative w-full">
+      <main className="flex-1 relative w-full">
         {/* Dynamic Header Title for Context - optional, since nav now shows active state, but nice for UX */}
         <div className="max-w-[1400px] mx-auto px-6 pt-8 pb-2">
           <h1 className="text-2xl font-black text-slate-800 tracking-tight">
