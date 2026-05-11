@@ -103,14 +103,14 @@ const About = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-black text-slate-900 mb-4">
-              Meet the Innovators
+              Meet the Management
             </h2>
             <p className="text-slate-500 font-medium">
-              The minds behind the SmartPolytunnel Platform.
+              The minds behind the WelGrow Plantations PVT LTD. 
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg gap-10">
             {/* Team Member 1 */}
             <TeamMember
               name="Givantha Weligamage"
@@ -120,14 +120,10 @@ const About = () => {
             {/* Team Member 2 */}
             <TeamMember
               name="Ruwan Weligamage"
-              role="Lead HR Manager"
+              role="Lead HR and Operational Manager"
               image="https://ui-avatars.com/api/?name=Member+Two&background=0f172a&color=fff&size=200"
             />
-            <TeamMember
-              name="Geeshan Weligamage"
-              role="Lead Operational Manager"
-              image="https://ui-avatars.com/api/?name=Member+Three&background=4f46e5&color=fff&size=200"
-            />
+            
           </div>
         </div>
       </section>

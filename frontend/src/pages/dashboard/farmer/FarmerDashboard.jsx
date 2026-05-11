@@ -53,22 +53,39 @@ const FarmerDashboard = () => {
   };
 
   // Top Navigation item component
-  const NavItem = ({ id, icon, label, mobile = false }) => (
-    <button
-      onClick={() => {
-        setActiveTab(id);
-        setIsSidebarOpen(false); // Close mobile menu if open
-      }}
-      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all font-bold text-sm ${mobile ? "w-full justify-start mb-2" : ""
-        } ${activeTab === id
-          ? "bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100"
-          : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-        }`}
-    >
-      {icon}
-      <span className={mobile ? "block" : "hidden xl:block"}>{label}</span>
-    </button>
-  );
+  const NavItem = ({ id, icon, label, mobile = false, href = null }) => {
+    if (href) {
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => setIsSidebarOpen(false)}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all font-bold text-sm ${mobile ? "w-full justify-start mb-2" : ""} text-slate-500 hover:bg-slate-100 hover:text-slate-800`}
+        >
+          {icon}
+          <span className={mobile ? "block" : "hidden xl:block"}>{label}</span>
+        </a>
+      );
+    }
+    
+    return (
+      <button
+        onClick={() => {
+          setActiveTab(id);
+          setIsSidebarOpen(false); // Close mobile menu if open
+        }}
+        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all font-bold text-sm ${mobile ? "w-full justify-start mb-2" : ""
+          } ${activeTab === id
+            ? "bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100"
+            : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+          }`}
+      >
+        {icon}
+        <span className={mobile ? "block" : "hidden xl:block"}>{label}</span>
+      </button>
+    );
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 font-sans text-slate-900">
@@ -82,7 +99,7 @@ const FarmerDashboard = () => {
               <Sprout size={22} className="text-white" />
             </div>
             <div className="flex flex-col justify-center gap-2">
-              <span className="font-black text-xl tracking-tight text-slate-800 leading-none">SmartAgro</span>
+              <span className="font-black text-xl tracking-tight text-slate-800 leading-none">WelGrow Palntation</span>
               <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest leading-none">Farmer Portal</span>
             </div>
           </div>
@@ -93,7 +110,7 @@ const FarmerDashboard = () => {
             <NavItem id="planner" icon={<CalendarDays size={18} />} label="Smart Planner" />
             <NavItem id="forecaster" icon={<BarChart3 size={18} />} label="Income Forecaster" />
             <NavItem id="agro-doctor" icon={<Stethoscope size={18} />} label="Agro-Doctor AI" />
-            <NavItem id="daily-prices" icon={<TrendingUp size={18} />} label="Daily Prices" />
+            <NavItem id="daily-prices" icon={<TrendingUp size={18} />} label="Daily Prices" href="https://dambulladec.com/home-dailyprice" />
           </nav>
 
           {/* Right Side Actions (Profile, Logout, Mobile Menu Toggle) */}
@@ -150,7 +167,7 @@ const FarmerDashboard = () => {
           <NavItem mobile id="planner" icon={<CalendarDays size={20} />} label="Smart Planner" />
           <NavItem mobile id="forecaster" icon={<BarChart3 size={20} />} label="Income Forecaster" />
           <NavItem mobile id="agro-doctor" icon={<Stethoscope size={20} />} label="Agro-Doctor AI" />
-          <NavItem mobile id="daily-prices" icon={<TrendingUp size={20} />} label="Daily Prices" />
+          <NavItem mobile id="daily-prices" icon={<TrendingUp size={20} />} label="Daily Prices" href="https://dambulladec.com/home-dailyprice" />
 
           <div className="h-px bg-slate-100 my-4"></div>
 
@@ -192,7 +209,6 @@ const FarmerDashboard = () => {
             {activeTab === "planner" && "Crop Planner"}
             {activeTab === "forecaster" && "Income & Revenue Forecasting"}
             {activeTab === "agro-doctor" && "AI Disease Diagnosis"}
-            {activeTab === "daily-prices" && "Real-time Market Prices"}
             {activeTab === "about" && "About SmartAgro"}
           </h1>
         </div>
@@ -210,9 +226,6 @@ const FarmerDashboard = () => {
             </div>
             <div className={activeTab === "agro-doctor" ? "block" : "hidden"}>
               <AgroDoctor />
-            </div>
-            <div className={activeTab === "daily-prices" ? "block" : "hidden"}>
-              <DailyPrices />
             </div>
             <div className={activeTab === "about" ? "block" : "hidden"}>
               <AboutUs />
