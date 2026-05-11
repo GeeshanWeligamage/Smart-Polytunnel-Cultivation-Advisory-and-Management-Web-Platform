@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 // Context එක import කරා
 import { AuthContext } from "../../context/AuthContext";
+import bgImage from '../../assets/images/agriculture.jpeg' //login page background image
 
 const Login = () => {
   const navigate = useNavigate();
@@ -83,12 +84,11 @@ const Login = () => {
       {/* Backgrounds */}
       <div
         className="absolute inset-0 z-0"
-        style={{
-          backgroundImage:
-            'url("https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?q=80&w=2664&auto=format&fit=crop")',
+        style={{ 
+          backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          filter: "grayscale(30%) brightness(40%)",
+          filter: "grayscale(30%) brightness(40%)", 
         }}
       ></div>
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-emerald-500/30 rounded-full blur-[100px] animate-pulse"></div>
@@ -105,7 +105,7 @@ const Login = () => {
                 <Leaf size={20} />
               </div>
               <span className="text-xl font-bold text-white tracking-tight">
-                SmartAgro
+                WelGrow Plantion
               </span>
             </Link>
             <h2 className="text-3xl font-black text-white mb-2 tracking-tight">
