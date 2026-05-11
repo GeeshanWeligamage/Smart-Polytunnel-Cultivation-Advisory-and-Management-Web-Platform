@@ -3,7 +3,16 @@ from flask_cors import CORS
 import pandas as pd
 import xgboost as xgb
 import os
+import json
+import io
 from datetime import datetime, timedelta
+
+# PyTorch imports for disease detection
+import torch
+import torch.nn as nn
+from torchvision import transforms, models
+from PIL import Image
+from disease_info import DISEASE_INFO
 
 app = Flask(__name__)
 # Enable CORS to allow API requests from the React frontend
@@ -266,7 +275,117 @@ def get_market_trends():
     except Exception as e:
         print("Market Trends Backend Error:", str(e))
         return jsonify({"message": "Internal server error occurred."}), 500
+# -------------------------------------------------------------------
+# 4. DISEASE DETECTION API (Agro Doctor)
+# -------------------------------------------------------------------
+
+# Load disease detection model at startup
+DISEASE_MODEL = None
+DISEASE_CLASSES = []
+
+def load_disease_model():
+    global DISEASE_MODEL, DISEASE_CLASSES
+    model_path = os.path.join(os.path.dirname(__file__), 'tomato_disease_model.pth')
+    classes_path = os.path.join(os.path.dirname(__file__), 'tomato_disease_classes.json')
+    
+    if not os.path.exists(model_path) or not os.path.exists(classes_path):
+        print("[WARNING] Disease model files not found. Agro Doctor will be unavailable.")
+        return
+    
+    # Load class names
+    with open(classes_path, 'r') as f:
+        DISEASE_CLASSES = json.load(f)
+    
+    # Build model architecture (must match training)
+    model = models.mobilenet_v2(weights=None)
+    model.classifier = nn.Sequential(
+        nn.Dropout(0.3),
+        nn.Linear(model.last_channel, 256),
+        nn.ReLU(),
+        nn.Dropout(0.2),
+        nn.Linear(256, len(DISEASE_CLASSES))
+    )
+    
+    # Load trained weights
+    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu'), weights_only=True))
+    model.eval()
+    DISEASE_MODEL = model
+    print(f"[OK] Disease detection model loaded with {len(DISEASE_CLASSES)} classes")
+
+# Image preprocessing (must match training)
+disease_transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+@app.route('/api/disease/predict', methods=['POST'])
+def predict_disease():
+    try:
+        if DISEASE_MODEL is None:
+            return jsonify({"error": "Disease detection model is not loaded. Please train the model first."}), 503
+        
+        if 'image' not in request.files:
+            return jsonify({"error": "No image file provided. Please upload an image."}), 400
+        
+        file = request.files['image']
+        
+        if file.filename == '':
+            return jsonify({"error": "Empty filename."}), 400
+        
+        # Read and preprocess image
+        image_bytes = file.read()
+        image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+        input_tensor = disease_transform(image).unsqueeze(0)  # Add batch dimension
+        
+        # Run prediction
+        with torch.no_grad():
+            outputs = DISEASE_MODEL(input_tensor)
+            probabilities = torch.nn.functional.softmax(outputs, dim=1)
+            confidence, predicted_idx = torch.max(probabilities, 1)
+            
+            confidence_pct = round(confidence.item() * 100, 1)
+            predicted_class = DISEASE_CLASSES[predicted_idx.item()]
+            
+        # --- CONFIDENCE THRESHOLD CHECK ---
+        # If the model is not very confident, it might be a random image (not a leaf)
+        # Deep learning models can sometimes be over 90% confident on random images, so we use a strict 95% threshold.
+        if confidence_pct < 95.0:
+            return jsonify({
+                "status": "success",
+                "diseaseName": "Unrecognized Image / Unclear",
+                "confidence": confidence_pct,
+                "severity": "None",
+                "description": "The AI is not confident about this image. It may not be a tomato plant leaf, or the image is too blurry. Please upload a clear photo of a single tomato leaf.",
+                "solution": [
+                    "Ensure the image is well-lit and focused.",
+                    "Make sure the image is actually a tomato leaf.",
+                    "Try taking a closer picture of the affected area."
+                ]
+            })
+        
+        # Get disease info from database
+        info = DISEASE_INFO.get(predicted_class, {
+            "name": predicted_class.replace("_", " "),
+            "severity": "Unknown",
+            "description": "No additional information available.",
+            "solutions": ["Consult a local agricultural expert for guidance."]
+        })
+        
+        return jsonify({
+            "status": "success",
+            "diseaseName": info["name"],
+            "confidence": confidence_pct,
+            "severity": info["severity"],
+            "description": info["description"],
+            "solution": info["solutions"]
+        })
+        
+    except Exception as e:
+        print(f"Disease Prediction Error: {str(e)}")
+        return jsonify({"error": f"Failed to analyze image: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    print("🚀 Smart Polytunnel XGBoost API is running on http://127.0.0.1:5001")
+    load_disease_model()
+    print("Smart Polytunnel API running on http://127.0.0.1:5001")
     app.run(debug=True, port=5001)

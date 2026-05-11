@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { UploadCloud, Stethoscope, Image as ImageIcon, X, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
+import axios from 'axios';
+import { UploadCloud, Stethoscope, Image as ImageIcon, X, CheckCircle2, AlertTriangle, Loader2, Info } from 'lucide-react';
 
 const AgroDoctor = () => {
   const fileInputRef = useRef(null);
@@ -7,6 +8,7 @@ const AgroDoctor = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
   // --- 1. Image Selection Handler ---
   const handleImageSelect = (e) => {
@@ -19,6 +21,7 @@ const AgroDoctor = () => {
       setSelectedImage(file);
       setImagePreview(URL.createObjectURL(file));
       setResult(null);
+      setError(null);
     }
   };
 
@@ -32,37 +35,49 @@ const AgroDoctor = () => {
     setSelectedImage(null);
     setImagePreview(null);
     setResult(null);
+    setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
-  // --- 4. MOCK AI ANALYSIS FUNCTION (English Data) ---
-  const handleAnalyze = () => {
+  // --- 4. REAL AI ANALYSIS - sends image to Flask ML backend ---
+  const handleAnalyze = async () => {
     if (!selectedImage) return;
 
     setIsAnalyzing(true);
+    setError(null);
+    setResult(null);
 
-    // Simulating AI Analysis Delay (3 Seconds)
-    setTimeout(() => {
-      // --- MOCK RESULT DATA (IN ENGLISH) ---
-      const mockResponse = {
-        status: "success",
-        diseaseName: "Tomato Early Blight",
-        confidence: 94.5,
-        severity: "Moderate",
-        solution: [
-          "Remove and destroy infected leaves immediately to prevent spread.",
-          "Ensure good air circulation between plants by pruning.",
-          "Apply a Copper-based fungicide at recommended intervals.",
-          "Avoid overhead irrigation to keep leaves dry.",
-          "Rotate crops every season to reduce soil-borne pathogens."
-        ]
-      };
+    try {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
 
-      setResult(mockResponse);
+      const response = await axios.post(
+        'http://localhost:5001/api/disease/predict',
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          timeout: 30000,
+        }
+      );
+
+      if (response.data.status === 'success') {
+        setResult(response.data);
+      } else {
+        setError(response.data.error || 'Analysis failed. Please try again.');
+      }
+    } catch (err) {
+      if (err.code === 'ECONNABORTED') {
+        setError('Analysis timed out. Please try again.');
+      } else if (err.response) {
+        setError(err.response.data?.error || 'Server returned an error.');
+      } else {
+        setError('Could not connect to AI server. Make sure the ML backend is running on port 5001.');
+      }
+    } finally {
       setIsAnalyzing(false);
-    }, 3000);
+    }
   };
 
   return (
@@ -137,6 +152,14 @@ const AgroDoctor = () => {
             {isAnalyzing ? 'Processing Image...' : <><Stethoscope /> Diagnose Now</>}
           </button>
 
+          {/* Error Display */}
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+              <AlertTriangle size={20} className="text-red-500 mt-0.5 shrink-0" />
+              <p className="text-sm font-semibold text-red-600">{error}</p>
+            </div>
+          )}
+
         </div>
 
         {/* --- RIGHT SIDE: Diagnosis Report Area --- */}
@@ -149,18 +172,44 @@ const AgroDoctor = () => {
               {/* Header: Disease Name & Confidence */}
               <div className="mb-8 border-b border-slate-100 pb-6">
                 <div className="flex items-center gap-2 mb-2">
-                   <AlertTriangle size={20} className="text-amber-500" />
-                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Detected Issue</p>
+                   {result.severity === "None" ? (
+                     <CheckCircle2 size={20} className="text-emerald-500" />
+                   ) : (
+                     <AlertTriangle size={20} className="text-amber-500" />
+                   )}
+                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                     {result.severity === "None" ? "Plant Status" : "Detected Issue"}
+                   </p>
                 </div>
                 <h3 className="text-2xl font-black text-slate-800 mb-2 leading-tight">{result.diseaseName}</h3>
+                
+                {/* Description */}
+                {result.description && (
+                  <p className="text-sm text-slate-500 mb-4 flex items-start gap-2">
+                    <Info size={16} className="mt-0.5 shrink-0 text-slate-400" />
+                    {result.description}
+                  </p>
+                )}
                 
                 <div className="flex gap-4 mt-4">
                    <div className="bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100">
                       <p className="text-xs font-bold text-emerald-600 uppercase">Confidence</p>
                       <p className="text-lg font-black text-slate-800">{result.confidence}%</p>
                    </div>
-                   <div className="bg-amber-50 px-4 py-2 rounded-xl border border-amber-100">
-                      <p className="text-xs font-bold text-amber-600 uppercase">Severity</p>
+                   <div className={`px-4 py-2 rounded-xl border ${
+                     result.severity === "None" ? "bg-emerald-50 border-emerald-100" :
+                     result.severity === "Moderate" ? "bg-amber-50 border-amber-100" :
+                     result.severity === "High" ? "bg-orange-50 border-orange-100" :
+                     result.severity === "Critical" ? "bg-red-50 border-red-100" :
+                     "bg-amber-50 border-amber-100"
+                   }`}>
+                      <p className={`text-xs font-bold uppercase ${
+                        result.severity === "None" ? "text-emerald-600" :
+                        result.severity === "Moderate" ? "text-amber-600" :
+                        result.severity === "High" ? "text-orange-600" :
+                        result.severity === "Critical" ? "text-red-600" :
+                        "text-amber-600"
+                      }`}>Severity</p>
                       <p className="text-lg font-black text-slate-800">{result.severity}</p>
                    </div>
                 </div>
