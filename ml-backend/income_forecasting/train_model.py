@@ -4,7 +4,8 @@ from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 import os
 
 # Configuration
-TRAIN_FILE = 'Train_Dataset.csv'
+BASE_DIR = os.path.dirname(__file__)
+TRAIN_FILE = os.path.join(BASE_DIR, 'data', 'Train_Dataset.csv')
 DATE_COL = 'Date Column'
 MIN_PRICE_COL = 'Min Price'
 MAX_PRICE_COL = 'Max Price'
@@ -92,8 +93,8 @@ for crop in unique_crops:
         continue
 
     safe_crop_name = str(crop).strip().replace(" ", "_").lower()
-    min_model_path = f"{safe_crop_name}_xgb_min.json"
-    max_model_path = f"{safe_crop_name}_xgb_max.json"
+    min_model_path = os.path.join(BASE_DIR, 'models', f"{safe_crop_name}_xgb_min.json")
+    max_model_path = os.path.join(BASE_DIR, 'models', f"{safe_crop_name}_xgb_max.json")
 
     if crop.lower() == 'cucumber':
         print("   -> Strategy: STABLE (No Outliers Removed)")

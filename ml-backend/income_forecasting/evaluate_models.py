@@ -5,7 +5,8 @@ import numpy as np
 import os
 
 # Define file names and column mappings
-TEST_FILE = 'Test_Dataset.csv'
+BASE_DIR = os.path.dirname(__file__)
+TEST_FILE = os.path.join(BASE_DIR, 'data', 'Test_Dataset.csv')
 DATE_COL = 'Date Column'
 CROP_COL = 'Crop Name'
 MIN_PRICE_COL = 'Min Price'
@@ -86,8 +87,8 @@ for crop in unique_crops:
 
     # Format crop name to match saved model filenames
     safe_crop_name = str(crop).strip().replace(" ", "_").lower()
-    min_model_path = f"{safe_crop_name}_xgb_min.json"
-    max_model_path = f"{safe_crop_name}_xgb_max.json"
+    min_model_path = os.path.join(BASE_DIR, 'models', f"{safe_crop_name}_xgb_min.json")
+    max_model_path = os.path.join(BASE_DIR, 'models', f"{safe_crop_name}_xgb_max.json")
 
     print("Evaluating Minimum Price Model...")
     evaluate_xgb_model(df_crop, MIN_PRICE_COL, min_model_path, "MIN PRICE")
