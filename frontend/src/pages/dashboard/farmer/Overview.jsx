@@ -50,7 +50,7 @@ const Overview = ({ onNavigate }) => {
         <div className="relative z-10 w-full">
           <div className="max-w-2xl">
             <h2 className="text-4xl font-black mb-4 tracking-tight drop-shadow-lg">
-              Welcome to WelGrow Palntation 
+              Welcome to WelGrow Plantation
             </h2>
 
             <p className="text-emerald-50 font-bold text-lg leading-relaxed drop-shadow-md">
