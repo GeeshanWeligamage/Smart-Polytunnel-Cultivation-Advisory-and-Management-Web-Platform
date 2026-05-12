@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   Leaf, 
   Target, 
@@ -30,6 +30,12 @@ const About = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const location = useLocation();
+  // Scroll to top when loading the about page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
   return (
     <div className="bg-slate-50 min-h-screen font-sans text-slate-900 selection:bg-emerald-100 selection:text-emerald-900">
       
@@ -42,14 +48,15 @@ const About = () => {
             <div className="w-11 h-11 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-200 transition-transform group-hover:scale-110">
               <Leaf size={26} />
             </div>
-            <span className="text-2xl font-black text-slate-800 tracking-tight">SmartPolytunnelAgro</span>
+            <span className="text-2xl font-black text-slate-800 tracking-tight">WelGrow Plantation</span>
           </Link>
           
           {/* Middle Links (Redirects to Home Sections) */}
           <div className="hidden md:flex items-center gap-10 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
-            <a href="/#features" className="hover:text-emerald-600 transition-colors">Features</a>
-            <a href="/#impact" className="hover:text-emerald-600 transition-colors">Our Impact</a>
+            <Link to="/#features" className="hover:text-emerald-600 transition-colors">Features</Link>
+            <Link to="/#impact" className="hover:text-emerald-600 transition-colors">Our Impact</Link>
             <Link to="/about" className="text-emerald-600 transition-colors">About Us</Link>
+            <Link to="/#contact" className="hover:text-emerald-600 transition-colors">Contact Us</Link>
           </div>
 
           {/* Login / Profile Button Logic */}
@@ -173,27 +180,22 @@ const About = () => {
       <section className="px-6 py-24 lg:px-12">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-black text-slate-900 mb-4">Meet the Innovators</h2>
-            <p className="text-slate-500 font-medium">The minds behind the SmartPolytunnel Platform.</p>
+            <h2 className="text-4xl font-black text-slate-900 mb-4">Meet the Management</h2>
+            <p className="text-slate-500 font-medium">The minds behind the WelGrow Plantations PVT LTD.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10">
             {/* Team Member 1 */}
             <TeamMember 
-              name="Your Name" 
-              role="Lead Developer & Researcher" 
-              image="https://ui-avatars.com/api/?name=User+Name&background=0d9488&color=fff&size=200"
+              name="Givantha Weligamage" 
+              role="Managing Director" 
+              image="https://ui-avatars.com/api/?name=Givantha+Weligamage&background=0d9488&color=fff&size=200"
             />
             {/* Team Member 2 */}
             <TeamMember 
-              name="Group Member 2" 
-              role="Hardware Engineer" 
-              image="https://ui-avatars.com/api/?name=Member+Two&background=0f172a&color=fff&size=200"
-            />
-             <TeamMember 
-              name="Group Member 3" 
-              role="Data Analyst" 
-              image="https://ui-avatars.com/api/?name=Member+Three&background=4f46e5&color=fff&size=200"
+              name="Ruwan Weligamage" 
+              role="Lead HR and Operational Manager" 
+              image="https://ui-avatars.com/api/?name=Ruwan+Weligamage&background=0f172a&color=fff&size=200"
             />
           </div>
         </div>
@@ -203,7 +205,7 @@ const About = () => {
       <section className="px-6 py-24 bg-slate-900 mt-12">
         <div className="max-w-4xl mx-auto text-center text-white">
           <h2 className="text-4xl font-black mb-6">Ready to Modernize Your Farm?</h2>
-          <p className="text-slate-400 mb-10 text-lg">Join thousands of farmers using SmartAgro today.</p>
+          <p className="text-slate-400 mb-10 text-lg">Join thousands of farmers using WelGrow Plantation today.</p>
           <div className="flex justify-center gap-4">
             <Link to="/register" className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-full font-bold text-lg transition-all flex items-center gap-2">
               Get Started <ArrowRight size={20} />
@@ -214,7 +216,7 @@ const About = () => {
 
       {/* Simple Footer */}
       <footer className="bg-slate-950 text-slate-600 py-8 text-center text-xs font-bold uppercase tracking-widest border-t border-slate-800">
-        &copy; 2026 SmartPolytunnelAgro System. All rights reserved.
+        &copy; 2026 WelGrow Plantation System. All rights reserved.
       </footer>
 
     </div>
