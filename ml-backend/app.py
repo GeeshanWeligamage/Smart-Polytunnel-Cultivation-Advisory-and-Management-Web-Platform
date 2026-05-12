@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 from torchvision import transforms, models
 from PIL import Image
-from disease_info import DISEASE_INFO
+from disease_detection.disease_info import DISEASE_INFO
 
 app = Flask(__name__)
 # Enable CORS to allow API requests from the React frontend
@@ -35,7 +35,9 @@ def load_xgb_model(crop_name, price_type):
     Loads the saved XGBoost JSON model for the specific crop and price type.
     """
     safe_crop_name = str(crop_name).strip().replace(" ", "_").lower()
-    model_path = f"{safe_crop_name}_xgb_{price_type}.json"
+    # Base path to income forecasting models
+    base_dir = os.path.dirname(__file__)
+    model_path = os.path.join(base_dir, 'income_forecasting', 'models', f"{safe_crop_name}_xgb_{price_type}.json")
     
     if not os.path.exists(model_path):
         return None
@@ -285,10 +287,28 @@ DISEASE_CLASSES = []
 
 def load_disease_model():
     global DISEASE_MODEL, DISEASE_CLASSES
-    model_path = os.path.join(os.path.dirname(__file__), 'tomato_disease_model.pth')
-    classes_path = os.path.join(os.path.dirname(__file__), 'tomato_disease_classes.json')
+    # Try multi-crop model first, then fall back to tomato-only model
+    base_models = os.path.join(os.path.dirname(__file__), 'disease_detection', 'models')
     
-    if not os.path.exists(model_path) or not os.path.exists(classes_path):
+    multi_model_path   = os.path.join(base_models, 'plant_disease_model.pth')
+    multi_classes_path = os.path.join(base_models, 'plant_disease_classes.json')
+    tomato_model_path   = os.path.join(base_models, 'tomato_disease_model.pth')
+    tomato_classes_path = os.path.join(base_models, 'tomato_disease_classes.json')
+
+    if os.path.exists(multi_model_path) and os.path.exists(multi_classes_path):
+        model_path   = multi_model_path
+        classes_path = multi_classes_path
+        print("[INFO] Loading multi-crop disease model (Tomato + Capsicum + Cucumber) ...")
+    elif os.path.exists(tomato_model_path) and os.path.exists(tomato_classes_path):
+        model_path   = tomato_model_path
+        classes_path = tomato_classes_path
+        print("[INFO] Loading tomato-only disease model ...")
+    else:
+        model_path   = None
+        classes_path = None
+    
+    if model_path is None or classes_path is None or \
+       not os.path.exists(model_path) or not os.path.exists(classes_path):
         print("[WARNING] Disease model files not found. Agro Doctor will be unavailable.")
         return
     
