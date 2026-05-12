@@ -99,7 +99,7 @@ const FarmerDashboard = () => {
               <Sprout size={22} className="text-white" />
             </div>
             <div className="flex flex-col justify-center gap-2">
-              <span className="font-black text-xl tracking-tight text-slate-800 leading-none">WelGrow Palntation</span>
+              <span className="font-black text-xl tracking-tight text-slate-800 leading-none">WelGrow Plantation</span>
               <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest leading-none">Farmer Portal</span>
             </div>
           </div>
