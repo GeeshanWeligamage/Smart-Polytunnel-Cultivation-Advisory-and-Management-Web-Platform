@@ -7,8 +7,8 @@ from torch.utils.data import DataLoader
 
 # Configuration
 DATASET_DIR = os.path.join(os.path.dirname(__file__), 'dataset', 'test')
-MODEL_PATH = os.path.join(os.path.dirname(__file__), 'tomato_disease_model.pth')
-CLASSES_PATH = os.path.join(os.path.dirname(__file__), 'tomato_disease_classes.json')
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'tomato_disease_model.pth')
+CLASSES_PATH = os.path.join(os.path.dirname(__file__), 'models', 'tomato_disease_classes.json')
 IMAGE_SIZE = 224
 BATCH_SIZE = 64
 
