@@ -30,6 +30,7 @@ import Overviwe from "./pages/dashboard/farmer/Overview";
 import TunnelDesign from "./pages/dashboard/farmer/TunnelDesign";
 // ProfitCalculator import එක අයින් කළා
 import AgroDoctor from "./pages/dashboard/farmer/AgroDoctor";
+import ScrollToTop from "./components/layout/ScrollToTop";
 
 /* ---------------- Protected Route ---------------- */
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -37,7 +38,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if (loading) return <div className="p-10 text-center">Loading...</div>;
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/" replace />;
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
@@ -144,6 +145,7 @@ const App = () => {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop />
         <AppRoutes />
       </Router>
     </AuthProvider>
