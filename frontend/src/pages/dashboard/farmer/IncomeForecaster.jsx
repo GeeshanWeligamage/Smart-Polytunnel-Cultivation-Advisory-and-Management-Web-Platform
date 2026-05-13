@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import {
   TrendingUp,
@@ -22,33 +22,40 @@ const IncomeForecaster = () => {
   const [isCalculated, setIsCalculated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [forecastResult, setForecastResult] = useState(null);
+  const [appliedInputs, setAppliedInputs] = useState(null); // Locks in inputs for calculation results view
+  const resultRef = useRef(null);
 
-  // Expenses calculation
-  const costPerPlant = 60;
-  const totalExpenses = (inputs.plantCount || 0) * costPerPlant;
+  // Prepare values using the FROZEN snapshot state
+  const activeInputs = appliedInputs || { tunnelSize: "0", crop: "Capsicum", plantCount: "0" };
 
-  // Calculate Total Expected Yield (Kg) based on harvest logic for all 3 crops
+  // Managing Cost calculation (Based on active snapshot data)
+  const selectedSize = parseFloat(activeInputs.tunnelSize) || 0;
+  const baseRate = activeInputs.crop === "Capsicum" ? 80000 : 60000; 
+  const totalManagingCost = (selectedSize / 1000) * baseRate;
+
+  // Calculate Total Expected Yield (Kg) based on active snapshot data
   let totalYieldKg = 0;
   if (forecastResult && forecastResult.totalHarvests) {
     const harvests = forecastResult.totalHarvests;
     let yieldPerPlant = 0;
+    const activeCrop = activeInputs.crop;
 
-    if (inputs.crop === "Capsicum") {
+    if (activeCrop === "Capsicum") {
       if (harvests >= 1) yieldPerPlant += 0.05;
       if (harvests >= 2) yieldPerPlant += 0.05;
       if (harvests >= 3) yieldPerPlant += 0.15;
       if (harvests > 3) yieldPerPlant += (harvests - 3) * 0.2;
-    } else if (inputs.crop === "Cucumber") {
+    } else if (activeCrop === "Cucumber") {
       if (harvests >= 1) yieldPerPlant += 0.4;
       if (harvests >= 2) yieldPerPlant += 0.6;
       if (harvests > 2) yieldPerPlant += (harvests - 2) * 0.6;
-    } else if (inputs.crop === "Tomato") {
+    } else if (activeCrop === "Tomato") {
       if (harvests >= 1) yieldPerPlant += 0.2;
       if (harvests >= 2) yieldPerPlant += 0.25;
       if (harvests > 2) yieldPerPlant += (harvests - 2) * 0.25;
     }
 
-    totalYieldKg = Math.round(yieldPerPlant * Number(inputs.plantCount));
+    totalYieldKg = Math.round(yieldPerPlant * Number(activeInputs.plantCount));
   }
 
   // Function to call the Backend API
@@ -83,7 +90,16 @@ const IncomeForecaster = () => {
       );
 
       setForecastResult(response.data);
+      setAppliedInputs({ ...inputs }); // Freezes dynamic data based on current fields
       setIsCalculated(true);
+      
+      // Delayed focus triggers absolute auto scrolling down to view panel
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 200);
     } catch (error) {
       if (error.response && error.response.data) {
         console.error("Backend Error:", error.response.data.message);
@@ -98,8 +114,11 @@ const IncomeForecaster = () => {
     setIsLoading(false);
   };
 
-  const StatCard = ({ title, value, subValue, icon: Icon, color }) => (
-    <div data-aos="fade-up" className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-md transition-all">
+  const StatCard = ({ title, value, subValue, icon: Icon, color, delay = 0 }) => (
+    <div 
+      style={{ animationDelay: `${delay}ms`, animationFillMode: "both" }}
+      className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-md transition-all animate-in fade-in slide-in-from-bottom-4 duration-700"
+    >
       <div
         className={`w-12 h-12 rounded-2xl ${color} bg-opacity-10 flex items-center justify-center text-${color.split("-")[1]}-600 mb-4`}
       >
@@ -133,16 +152,33 @@ const IncomeForecaster = () => {
             <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
               <Ruler size={12} /> Tunnel Size (Sqft)
             </label>
-            <input
-              type="number"
-              placeholder="e.g. 1000"
+            <select
               required
               value={inputs.tunnelSize}
-              className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              onChange={(e) =>
-                setInputs({ ...inputs, tunnelSize: e.target.value })
-              }
-            />
+              className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 appearance-none cursor-pointer"
+              onChange={(e) => {
+                const sizeVal = e.target.value;
+                if (sizeVal) {
+                  const numericSize = parseInt(sizeVal);
+                  const calculatedPlants = Math.round(numericSize * 0.25); // 250 plants per 1000 sqft ratio (0.25)
+                  setInputs({
+                    ...inputs,
+                    tunnelSize: sizeVal,
+                    plantCount: calculatedPlants.toString(),
+                  });
+                } else {
+                  setInputs({ ...inputs, tunnelSize: "", plantCount: "" });
+                }
+              }}
+            >
+              <option value="" disabled>Select Size</option>
+              <option value="1000">1000 SQFT</option>
+              <option value="1500">1500 SQFT</option>
+              <option value="2500">2500 SQFT</option>
+              <option value="5000">5000 SQFT</option>
+              <option value="7500">7500 SQFT</option>
+              <option value="10000">10000 SQFT</option>
+            </select>
           </div>
 
           <div className="space-y-2">
@@ -205,6 +241,7 @@ const IncomeForecaster = () => {
                 setInputs({ tunnelSize: "", crop: "Capsicum", plantCount: "", plantedDate: "" });
                 setIsCalculated(false);
                 setForecastResult(null);
+                setAppliedInputs(null);
               }}
               className="bg-white hover:bg-slate-50 text-slate-500 hover:text-red-500 px-8 py-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all border-2 border-slate-100 hover:border-red-200 active:scale-[0.98]"
             >
@@ -214,8 +251,24 @@ const IncomeForecaster = () => {
         </form>
       </div>
 
-      {isCalculated && forecastResult && (
-        <div className="space-y-8 animate-in slide-in-from-bottom duration-700">
+      {isCalculated && forecastResult && appliedInputs && (
+        <div
+          ref={resultRef}
+          data-aos="fade-up"
+          className="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm space-y-8 animate-in slide-in-from-bottom duration-700 scroll-mt-10"
+        >
+          <div className="flex items-center gap-3 border-b border-slate-50 pb-6">
+            <div className="w-10 h-10 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600">
+              <TrendingUp size={20} />
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-slate-800">Forecast Calculations</h3>
+              <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-0.5">
+                Snapshot: {activeInputs.crop} • {activeInputs.tunnelSize} SQFT • {activeInputs.plantCount} Plants
+              </p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard
               title="Expected Revenue"
@@ -223,27 +276,31 @@ const IncomeForecaster = () => {
               subValue="Projected gross income range"
               icon={TrendingUp}
               color="bg-emerald-500"
+              delay={0}
             />
             <StatCard
               title="Total Expected Yield"
               value={`${totalYieldKg.toLocaleString()} Kg`}
-              subValue={`Estimated yield from ${inputs.plantCount} plants`}
+              subValue={`Estimated yield from ${activeInputs.plantCount} plants`}
               icon={Leaf}
               color="bg-purple-500"
+              delay={100}
             />
             <StatCard
               title="Harvest Rounds"
               value={`${forecastResult.totalHarvests || 0} Times`}
-              subValue={`Total pickings for ${inputs.plantCount} plants`}
+              subValue={`Total pickings for ${activeInputs.plantCount} plants`}
               icon={Sprout}
               color="bg-blue-500"
+              delay={200}
             />
             <StatCard
-              title="Expected Expenses"
-              value={`Rs. ${totalExpenses.toLocaleString()}`}
-              subValue={`Cost for ${inputs.plantCount} plants`}
+              title="Managing Cost"
+              value={`Rs. ${totalManagingCost.toLocaleString()}`}
+              subValue="Full Period (Excludes Labour)"
               icon={Wallet}
               color="bg-amber-500"
+              delay={300}
             />
           </div>
         </div>
