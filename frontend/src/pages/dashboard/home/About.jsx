@@ -144,35 +144,30 @@ const About = () => {
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-10">
-            <p className="text-white/90 text-lg font-medium">Smart Polytunnels in Nuwara Eliya</p>
+            <p className="text-white/90 text-lg font-medium"></p>
           </div>
         </div>
       </section>
 
       {/* --- Vision & Mission Grid --- */}
       <section className="px-6 py-10 lg:px-12 bg-white">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8">
           
           <InfoCard 
             icon={<Target size={32} />}
             title="Our Mission"
-            desc="To reduce crop wastage by 40% using real-time environmental monitoring and AI-driven disease prediction models."
+            desc="To bridge the gap between traditional farming and modern technology by providing real-time market insights, smart planning tools, and accurate income forecasting to maximize farmer success." 
             color="emerald"
           />
           
           <InfoCard 
             icon={<Award size={32} />}
             title="Our Vision"
-            desc="A self-sufficient Sri Lanka where technology eliminates the uncertainty of farming, ensuring profitability for every cultivator."
+            desc="To empower the farming community through data-driven innovation, ensuring a prosperous and sustainable future for local agriculture."
             color="blue"
           />
 
-          <InfoCard 
-            icon={<Cpu size={32} />}
-            title="The Technology"
-            desc="Powered by React, Node.js, and IoT sensors. We use cutting-edge algorithms to process soil and climate data instantly."
-            color="orange"
-          />
+          
 
         </div>
       </section>

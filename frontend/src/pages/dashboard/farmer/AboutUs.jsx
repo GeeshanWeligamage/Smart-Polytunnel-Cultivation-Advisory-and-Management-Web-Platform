@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
 import {
-  Leaf,
   Target,
   Award,
   Users,
@@ -11,27 +9,12 @@ import {
   Linkedin,
   Github,
   Twitter,
-  Zap,
-  PlayCircle,
   Phone,
   Mail,
   MapPin,
 } from "lucide-react";
-import { AuthContext } from "../../../context/AuthContext";
 
 const About = () => {
-  const { user, logout } = useContext(AuthContext);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
     <div className="bg-slate-50 min-h-screen font-sans text-slate-900 selection:bg-emerald-100 selection:text-emerald-900">
       {/* --- Hero Section --- */}

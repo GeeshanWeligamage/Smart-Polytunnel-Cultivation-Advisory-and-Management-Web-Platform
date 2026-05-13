@@ -161,9 +161,11 @@ const Home = ({ onStart, user }) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <FeatureCard icon={<Ruler size={32} />} title="Smart Designer" desc="Scientific structural layouts based on your land terrain and local climate zones." color="emerald" />
-            <FeatureCard icon={<TrendingUp size={32} />} title="Finance Engine" desc="Profit forecasting using real-time price feeds from Colombo Economic Centers." color="blue" />
-            <FeatureCard icon={<Stethoscope size={32} />} title="AI Plant Help" desc="Identify plant pathologies instantly with our high-accuracy vision AI model." color="orange" />
+            <FeatureCard icon={<Stethoscope size={32} />} title="AI Plant Help" desc="Identify plant diseases instantly with our high-accuracy vision AI model." color="emerald" />
+            <FeatureCard icon={<TrendingUp size={32} />} title="Finance Engine" desc="Profit forecasting using real-time price feeds from Dambulla Economic Center." color="blue" />
+            <FeatureCard icon={<Ruler size={32} />} title="Smart Designer" desc="Scientific structural layouts based on your land terrain and local climate zones." color="orange" />
+             
+            
             
           </div>
         </div>

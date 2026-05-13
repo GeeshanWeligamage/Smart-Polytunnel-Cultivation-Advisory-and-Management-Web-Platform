@@ -26,7 +26,7 @@ import ManageStructure from "./pages/dashboard/admin/ManageStructure";
 
 // Farmer Pages
 import FarmerDashboard from "./pages/dashboard/farmer/FarmerDashboard";
-import Overviwe from "./pages/dashboard/farmer/Overview";
+import Overview from "./pages/dashboard/farmer/Overview";
 import TunnelDesign from "./pages/dashboard/farmer/TunnelDesign";
 // ProfitCalculator import එක අයින් කළා
 import AgroDoctor from "./pages/dashboard/farmer/AgroDoctor";
@@ -104,7 +104,7 @@ const AppRoutes = () => {
         path="/overview"
         element={
           <ProtectedRoute allowedRoles={["farmer"]}>
-            <Overviwe />
+            <Overview />
           </ProtectedRoute>
         }
       />
