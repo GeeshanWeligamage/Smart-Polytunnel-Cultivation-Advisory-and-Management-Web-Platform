@@ -7,6 +7,7 @@ import {
 
 import { AuthContext } from '../../../context/AuthContext'; 
 import agroImage from '../../../assets/images/1e2be13c93da5c38251f4820540750cf.jpg';
+import Footer from "../../../components/layout/Footer";
 
 const Home = ({ onStart, user }) => {
   
@@ -255,29 +256,7 @@ const Home = ({ onStart, user }) => {
           </div>
         </div>
       </section>
-
-      {/* --- Footer --- */}
-      <footer className="px-6 py-16 md:px-12 border-t border-slate-200 bg-white">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white">
-              <Leaf size={18} />
-            </div>
-            <span className="text-xl font-black text-slate-800 tracking-tight">WelGrow Plantation</span>
-          </div>
-          
-          <div className="flex flex-wrap justify-center gap-10 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-            <a href="#" className="hover:text-emerald-600 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-emerald-600 transition-colors">Terms</a>
-            <a href="#" className="hover:text-emerald-600 transition-colors">Developer API</a>
-            <a href="#" className="hover:text-emerald-600 transition-colors">Contact</a>
-          </div>
-
-          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">
-            © 2026 WelGrow Plantation Platform.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

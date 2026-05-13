@@ -15,6 +15,7 @@ import {
   PlayCircle
 } from 'lucide-react';
 import { AuthContext } from '../../../context/AuthContext'; // Context එක import කරා
+import Footer from "../../../components/layout/Footer";
 
 const About = () => {
   const { user, logout } = useContext(AuthContext); // User විස්තර ගත්තා
@@ -214,11 +215,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Simple Footer */}
-      <footer className="bg-slate-950 text-slate-600 py-8 text-center text-xs font-bold uppercase tracking-widest border-t border-slate-800">
-        &copy; 2026 WelGrow Plantation System. All rights reserved.
-      </footer>
-
+      <Footer />
     </div>
   );
 };
