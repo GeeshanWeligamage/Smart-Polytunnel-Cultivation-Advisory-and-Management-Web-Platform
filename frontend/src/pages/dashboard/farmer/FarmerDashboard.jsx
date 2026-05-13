@@ -21,6 +21,7 @@ import DailyPrices from "./DailyPrices";
 import IncomeForecaster from "./IncomeForecaster";
 import MarketTrends from "./MarketTrends";
 import AboutUs from "./AboutUs";
+import Footer from "../../../components/layout/Footer";
 
 const FarmerDashboard = () => {
   const { user, logout } = useContext(AuthContext);
@@ -28,23 +29,24 @@ const FarmerDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0); // Resets viewport to top when switching tabs
     AOS.refresh();
   }, [activeTab]);
 
-  // Function to navigate to the Overview tab and scroll to a specific section
-  const scrollToSection = (sectionId) => {
-    if (activeTab !== "overview") {
-      // Switch to overview tab first if not already there
-      setActiveTab("overview");
-      // Delay scrolling slightly to allow the component to mount
+  // Function to navigate to a specific tab and scroll to a section inside it
+  const scrollToSection = (tabId, sectionId) => {
+    if (activeTab !== tabId) {
+      // Switch to target tab first
+      setActiveTab(tabId);
+      // Delay scrolling slightly to allow component mounting and rendering stabilization
       setTimeout(() => {
         const element = document.getElementById(sectionId);
         if (element) {
           element.scrollIntoView({ behavior: "smooth" });
         }
-      }, 150);
+      }, 300);
     } else {
-      // Scroll directly if already on the overview tab
+      // Scroll directly if already on the correct tab
       const element = document.getElementById(sectionId);
       if (element) {
         element.scrollIntoView({ behavior: "smooth" });
@@ -123,7 +125,7 @@ const FarmerDashboard = () => {
                 About Us
               </button>
               <button
-                onClick={() => scrollToSection("contact-us")}
+                onClick={() => scrollToSection("about", "contact")}
                 className="px-3 py-2 rounded-xl text-sm font-bold text-slate-500 bg-transparent hover:text-emerald-600 hover:bg-emerald-50 transition-all"
               >
                 Contact Us
@@ -178,7 +180,7 @@ const FarmerDashboard = () => {
             About Us
           </button>
           <button
-            onClick={() => { scrollToSection("contact-us"); setIsSidebarOpen(false); }}
+            onClick={() => { scrollToSection("about", "contact"); setIsSidebarOpen(false); }}
             className="w-full text-left px-4 py-2.5 font-bold text-sm text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl"
           >
             Contact Us
@@ -209,7 +211,6 @@ const FarmerDashboard = () => {
             {activeTab === "planner" && "Crop Planner"}
             {activeTab === "forecaster" && "Income & Revenue Forecasting"}
             {activeTab === "agro-doctor" && "AI Disease Diagnosis"}
-            {activeTab === "about" && "About SmartAgro"}
           </h1>
         </div>
 
@@ -232,6 +233,7 @@ const FarmerDashboard = () => {
             </div>
           </div>
         </div>
+        <Footer />
       </main>
     </div>
   );

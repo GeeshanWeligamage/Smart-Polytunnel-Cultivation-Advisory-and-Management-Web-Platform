@@ -11,17 +11,19 @@ import {
   Linkedin,
   Github,
   Twitter,
-  Zap, // Add missing icons
+  Zap,
   PlayCircle,
+  Phone,
+  Mail,
+  MapPin,
 } from "lucide-react";
-import { AuthContext } from "../../../context/AuthContext"; // Context එක import කරා
+import { AuthContext } from "../../../context/AuthContext";
 
 const About = () => {
-  const { user, logout } = useContext(AuthContext); // User විස්තර ගත්තා
+  const { user, logout } = useContext(AuthContext);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // Scroll කරනකොට Navbar එක වෙනස් වෙන Effect එක
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -33,7 +35,7 @@ const About = () => {
   return (
     <div className="bg-slate-50 min-h-screen font-sans text-slate-900 selection:bg-emerald-100 selection:text-emerald-900">
       {/* --- Hero Section --- */}
-      <header className="relative pt-40 pb-20 px-6 lg:px-12 overflow-hidden">
+      <header className="relative pt-2 pb-20 px-6 lg:px-12 overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-[10px] font-bold mb-8 border border-emerald-100 uppercase tracking-[0.2em]">
             <Sprout size={14} /> Since 2026
@@ -66,7 +68,7 @@ const About = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-10">
             <p className="text-white/90 text-lg font-medium">
-              Smart Polytunnels in Nuwara Eliya
+              
             </p>
           </div>
         </div>
@@ -106,11 +108,11 @@ const About = () => {
               Meet the Management
             </h2>
             <p className="text-slate-500 font-medium">
-              The minds behind the WelGrow Plantations PVT LTD. 
+              The minds behind the WelGrow Plantations PVT LTD.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:gap-10 gap-10">
             {/* Team Member 1 */}
             <TeamMember
               name="Givantha Weligamage"
@@ -123,17 +125,72 @@ const About = () => {
               role="Lead HR and Operational Manager"
               image="https://ui-avatars.com/api/?name=Member+Two&background=0f172a&color=fff&size=200"
             />
-            
           </div>
         </div>
       </section>
 
-    
+      {/* --- Contact Section (Aluthin ekathu kala kotasa) --- */}
+      <section id="contact" className="px-6 py-24 md:px-12 bg-white">
+        <div className="max-w-7xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">Get in Touch</h2>
+            <p className="text-slate-500 font-medium max-w-2xl mx-auto">
+              Have questions about smart polytunnels or our AI solutions? We're here to help.
+            </p>
+            <div className="h-1.5 w-24 bg-emerald-500 mx-auto rounded-full"></div>
+          </div>
 
-      {/* Simple Footer */}
-      <footer className="bg-slate-950 text-slate-600 py-8 text-center text-xs font-bold uppercase tracking-widest border-t border-slate-800">
-        &copy; 2026 SmartPolytunnelAgro System. All rights reserved.
-      </footer>
+          {/* Contact Card */}
+          <div className="max-w-4xl mx-auto bg-slate-50 rounded-[3rem] p-10 md:p-14 shadow-xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden">
+            {/* Background elements for card */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-200/20 rounded-full blur-[80px]"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-200/20 rounded-full blur-[80px]"></div>
+            
+            {/* Contact Info */}
+            <div className="relative z-10 flex flex-col items-center text-center">
+              <div className="mb-12">
+                <h3 className="text-3xl font-black text-slate-900 mb-4">Contact Information</h3>
+                <p className="text-slate-500 font-medium leading-relaxed max-w-md mx-auto">
+                  Reach out to us directly, and our agronomists will get back to you as soon as possible.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 w-full">
+                <div className="flex flex-col items-center gap-4 group">
+                  <div className="w-16 h-16 rounded-[1.5rem] bg-white border border-slate-200 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+                    <Phone size={24} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Phone</p>
+                    <p className="text-lg font-bold text-slate-800">+94 77 123 4567</p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col items-center gap-4 group">
+                  <div className="w-16 h-16 rounded-[1.5rem] bg-white border border-slate-200 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+                    <Mail size={24} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Email</p>
+                    <p className="text-lg font-bold text-slate-800">info@welgrow.lk</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-center gap-4 group">
+                  <div className="w-16 h-16 rounded-[1.5rem] bg-white border border-slate-200 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+                    <MapPin size={24} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Location</p>
+                    <p className="text-base font-bold text-slate-800 leading-tight">No 45, Agrarian Road,<br/>Nuwara Eliya</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
