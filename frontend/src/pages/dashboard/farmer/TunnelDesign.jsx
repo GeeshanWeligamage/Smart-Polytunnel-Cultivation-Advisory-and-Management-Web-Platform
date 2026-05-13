@@ -437,8 +437,47 @@ const TunnelDesign = () => {
   };
 
   const processResult = (config) => {
-    const estimatedWidth = Math.sqrt(config.size / 4);
-    const estimatedLength = config.size / estimatedWidth;
+    const l = parseFloat(land.length) || 0;
+    const w = parseFloat(land.width) || 0;
+    const targetArea = config.size;
+
+    let estimatedLength, estimatedWidth;
+
+    if (l > BUFFER && w > BUFFER) {
+      const maxL = l - BUFFER;
+      const maxW = w - BUFFER;
+
+      // Start with standard 4:1 aspect ratio
+      let idealW = Math.sqrt(targetArea / 4);
+      let idealL = targetArea / idealW;
+
+      let finalL, finalW;
+      // Match the physical orientation of the land
+      if (maxW > maxL) {
+        finalW = Math.max(idealL, idealW);
+        finalL = Math.min(idealL, idealW);
+      } else {
+        finalL = Math.max(idealL, idealW);
+        finalW = Math.min(idealL, idealW);
+      }
+
+      // Enforce boundary limits. If constrained, recalculate other dimension.
+      if (finalL > maxL) {
+        finalL = maxL;
+        finalW = targetArea / finalL;
+      }
+      if (finalW > maxW) {
+        finalW = maxW;
+        finalL = targetArea / finalW;
+      }
+
+      estimatedLength = finalL;
+      estimatedWidth = finalW;
+    } else {
+      // Fallback to hardcoded ratio
+      estimatedWidth = Math.sqrt(targetArea / 4);
+      estimatedLength = targetArea / estimatedWidth;
+    }
 
     setResult({
       ...config,
@@ -558,7 +597,7 @@ const TunnelDesign = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">
-                Length
+                Length(ft)
               </label>
               <input
                 type="number"
@@ -566,12 +605,12 @@ const TunnelDesign = () => {
                 onChange={(e) => setLand({ ...land, length: e.target.value })}
                 onWheel={(e) => e.target.blur()}
                 className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-5 font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all"
-                placeholder="0"
+                placeholder="ft"
               />
             </div>
             <div className="space-y-3">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">
-                Width
+                Width(ft)
               </label>
               <input
                 type="number"
@@ -579,7 +618,7 @@ const TunnelDesign = () => {
                 onChange={(e) => setLand({ ...land, width: e.target.value })}
                 onWheel={(e) => e.target.blur()}
                 className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-5 font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all"
-                placeholder="0"
+                placeholder="ft"
               />
             </div>
           </div>
