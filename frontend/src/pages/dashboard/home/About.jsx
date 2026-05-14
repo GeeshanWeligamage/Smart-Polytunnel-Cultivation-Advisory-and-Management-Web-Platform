@@ -14,15 +14,15 @@ import {
   Zap, // Add missing icons
   PlayCircle
 } from 'lucide-react';
-import { AuthContext } from '../../../context/AuthContext'; // Context එක import කරා
+import { AuthContext } from '../../../context/AuthContext'; // Imported Context
 import Footer from "../../../components/layout/Footer";
 
 const About = () => {
-  const { user, logout } = useContext(AuthContext); // User විස්තර ගත්තා
+  const { user, logout } = useContext(AuthContext); // Retrieved User details
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // Scroll කරනකොට Navbar එක වෙනස් වෙන Effect එක
+  // Effect to change the Navbar on scroll
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);

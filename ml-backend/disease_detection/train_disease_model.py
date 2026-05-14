@@ -13,7 +13,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
 from collections import Counter
-import matplotlib.pyplot as plt  # <--- අලුතින් එකතු කළා
+import matplotlib.pyplot as plt  # <--- Newly added
 
 # ── Configuration ────────────────────────────────────────────────────────────
 BASE_DIR         = os.path.dirname(__file__)
@@ -113,7 +113,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.classifier.parameters(), lr=LEARNING_RATE)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.5)
 
-# ප්‍රස්තාර අඳින්න Data එකතු කරගන්න හිස් Lists හදාගැනීම
+# Initialize empty lists to store data for plotting graphs
 history_train_loss = []
 history_val_loss = []
 history_train_acc = []
@@ -172,7 +172,7 @@ for epoch in range(NUM_EPOCHS):
     val_loss = val_loss_sum / len(val_loader)
     elapsed  = time.time() - t0
     
-    # හැම Epoch එකක් ඉවර වුණාම Lists වලට Data දාගැනීම
+    # Append data to lists at the end of each epoch
     history_train_loss.append(train_loss)
     history_val_loss.append(val_loss)
     history_train_acc.append(train_acc)
@@ -205,7 +205,7 @@ print(f"       Model saved       : {MODEL_SAVE_PATH}")
 print(f"       Classes saved     : {CLASSES_SAVE_PATH}")
 print("=" * 55)
 
-# ── ප්‍රස්තාර (Graphs) ඇඳීම සහ Save කිරීම ─────────────────────────────────────
+# ── Plot and Save Graphs ─────────────────────────────────────
 print("\n[INFO] Generating Accuracy and Loss Graphs...")
 graphs_dir = os.path.dirname(MODEL_SAVE_PATH)
 

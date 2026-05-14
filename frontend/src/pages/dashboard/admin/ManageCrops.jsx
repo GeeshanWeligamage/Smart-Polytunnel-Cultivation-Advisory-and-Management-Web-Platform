@@ -41,7 +41,7 @@ const ManageCrops = () => {
     const maxSizeInBytes = 10 * 1024 * 1024;
     if (file.size > maxSizeInBytes) {
       alert(
-        "සමාවන්න, මෙම ඡායාරූපය 10MB ට වඩා වැඩියි. කරුණාකර කුඩා ඡායාරූපයක් තෝරන්න.",
+        "Sorry, this image is larger than 10MB. Please select a smaller image.",
       );
       e.target.value = "";
       return;
@@ -205,7 +205,7 @@ const ManageCrops = () => {
                       type="number"
                       placeholder="150"
                       required
-                      /* Arrows ඉවත් කිරීමට අවශ්‍ය CSS classes මෙන්න */
+                      /* CSS classes to remove arrows are here */
                       className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-blue-500/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       onChange={(e) =>
                         setFormData({ ...formData, priceMin: e.target.value })
@@ -220,7 +220,7 @@ const ManageCrops = () => {
                       type="number"
                       placeholder="180"
                       required
-                      /* Arrows ඉවත් කිරීමට අවශ්‍ය CSS classes මෙන්න */
+                      /* CSS classes to remove arrows are here */
                       className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold outline-none focus:ring-2 focus:ring-blue-500/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       onChange={(e) =>
                         setFormData({ ...formData, priceMax: e.target.value })

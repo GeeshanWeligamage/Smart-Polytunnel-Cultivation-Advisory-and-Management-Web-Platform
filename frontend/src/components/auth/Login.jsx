@@ -11,13 +11,13 @@ import {
   ShieldCheck,
   Loader2,
 } from "lucide-react";
-// Context එක import කරා
+// Imported Context
 import { AuthContext } from "../../context/AuthContext";
 import bgImage from '../../assets/images/agriculture.jpeg' //login page background image
 
 const Login = () => {
   const navigate = useNavigate();
-  // Context එකෙන් login function එක ගත්තා
+  // Destructured login function from Context
   const { login } = useContext(AuthContext);
 
   const [role, setRole] = useState("farmer");
@@ -37,7 +37,7 @@ const Login = () => {
     setError("");
 
     try {
-      // Backend Login API එකට Request එක යැවීම
+      // Sending request to the Backend Login API
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
         headers: {
@@ -52,24 +52,24 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Login සාර්ථක නම් (Backend එකෙන් ලැබෙන user data සහ role එක බලමු)
-        // ඔබ තෝරාගත් role එක සහ database එකේ ඇති role එක සමානදැයි පරීක්ෂා කිරීම වඩාත් සුදුසුයි
+        // If login is successful (check user data and role from backend)
+        // It is better to verify if the selected role matches the role in the database
         if (data.user.role !== role) {
           setError(`You are not registered as a ${role}.`);
           setIsLoading(false);
           return;
         }
 
-        login(data.user); // AuthContext එක update කිරීම
+        login(data.user); // Updating AuthContext
 
-        // Dashboard එකට යොමු කිරීම
+        // Redirecting to Dashboard
         if (data.user.role === "admin") {
           navigate("/admin-dashboard");
         } else {
           navigate("/farmer-dashboard");
         }
       } else {
-        // Backend එකෙන් එන error එක පෙන්වීම (Invalid credentials)
+        // Displaying error from Backend (Invalid credentials)
         setError(data.message || "Invalid login credentials.");
       }
     } catch (err) {

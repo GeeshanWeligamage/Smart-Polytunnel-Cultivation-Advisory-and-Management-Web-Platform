@@ -23,7 +23,7 @@ const DailyPrices = () => {
 
   const [selectedCropForHistory, setSelectedCropForHistory] = useState(null);
 
-  // දිනය වෙනස් වන සෑම විටම දත්ත නැවත ලබා ගනී
+  // Fetch data again whenever the date changes
   useEffect(() => {
     fetchPrices();
   }, [selectedDate]);
@@ -31,11 +31,11 @@ const DailyPrices = () => {
   const fetchPrices = async () => {
     setLoading(true);
     try {
-      // Backend එකෙන් අදාළ දිනයට පමණක් දත්ත ලබා ගැනීම
+      // Fetch data only for the specific date from the Backend
       const response = await fetch(`http://localhost:5000/api/prices?date=${selectedDate}`);
       const data = await response.json();
 
-      // console.log("Fetched Data:", data); // මෙතනින් ඔයාට එන දත්ත පරීක්ෂා කළ හැකියි
+      // console.log("Fetched Data:", data); // You can inspect the received data here
 
       if (data && data.length > 0) {
         setPrices(data);
@@ -145,7 +145,7 @@ const DailyPrices = () => {
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                     Current Rate (KG)
                   </p>
-                  {/* මෙතන මම minPrice සහ priceMin දෙකම check කරන ලොජික් එක දැම්මා */}
+                  {/* Here I added the logic to check both minPrice and priceMin */}
                   <p className="text-xl font-black text-emerald-600 pt-1">
                     Rs. {item.minPrice || item.priceMin || "-"} - {item.maxPrice || item.priceMax || "-"}
                   </p>

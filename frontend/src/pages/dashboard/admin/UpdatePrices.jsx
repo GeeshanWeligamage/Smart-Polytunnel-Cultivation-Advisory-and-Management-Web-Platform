@@ -12,7 +12,7 @@ const UpdatePrices = () => {
     priceMax: "",
   });
 
-  // අනාගත දින Block කිරීමට අද දිනය ලබා ගැනීම
+  // Get today's date to block future dates
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {

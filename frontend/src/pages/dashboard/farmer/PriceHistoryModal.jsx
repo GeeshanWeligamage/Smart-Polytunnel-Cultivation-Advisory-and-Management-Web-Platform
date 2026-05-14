@@ -18,16 +18,16 @@ const PriceHistoryModal = ({ isOpen, onClose, cropName, history }) => {
 
   if (!isOpen) return null;
 
-  // Chart එකට දත්ත සකස් කිරීම සහ Sort කිරීම
+  // Formatting and sorting data for the Chart
   const getFilteredData = () => {
     if (!history || history.length === 0) return [];
 
-    // 1. දින ටික පරණ එකේ සිට අලුත් එකට Sort කිරීම (Straight lines සඳහා මෙය අත්‍යවශ්‍යයි)
+    // 1. Sort dates from oldest to newest (This is essential for straight lines)
     let sortedData = [...history].sort(
       (a, b) => new Date(a.date) - new Date(b.date),
     );
 
-    // 2. Range එක අනුව Filter කිරීම
+    // 2. Filter based on Range
     if (range !== "all") {
       const daysMap = { "5D": 5, "10D": 10, "1M": 30, "1Y": 365, "5Y": 1825 };
       sortedData = sortedData.slice(-daysMap[range]);
@@ -132,8 +132,8 @@ const PriceHistoryModal = ({ isOpen, onClose, cropName, history }) => {
                   />
                   <Legend verticalAlign="top" height={36} />
 
-                  {/* type="linear" යෙදීමෙන් රේඛාව කෙලින් (Straight) වේ. 
-                    type="monotone" තිබුණොත් එය වක්‍ර (Curve) වේ.
+                  {/* Using type="linear" makes the line straight. 
+                    If type="monotone" is used, it will be curved.
                   */}
                   {showMax && (
                     <Line

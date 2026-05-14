@@ -5,7 +5,7 @@ const priceSchema = new mongoose.Schema(
     cropName: { type: String, required: true },
     category: { type: String, required: true },
     image: { type: String },
-    // දිනපතා මිල ගණන් ගබඩා වන Array එක
+    // Array to store daily prices
     history: [
       {
         date: { type: String, required: true },

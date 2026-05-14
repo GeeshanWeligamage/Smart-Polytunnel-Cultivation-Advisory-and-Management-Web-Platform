@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'; // useContext එකතු කළා
+import React, { useState, useEffect, useContext } from 'react'; // Added useContext
 import { Link, useLocation } from 'react-router-dom';
 import { 
   ArrowRight, Ruler, TrendingUp, Stethoscope, MessageSquare, ChevronRight,

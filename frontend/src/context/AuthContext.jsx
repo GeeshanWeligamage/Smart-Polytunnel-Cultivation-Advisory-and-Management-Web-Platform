@@ -6,7 +6,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ඇප් එක පටන් ගන්නකොට කලින් Log වෙලා හිටියද කියලා බලනවා
+  // Check if the user was already logged in when the app starts
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {

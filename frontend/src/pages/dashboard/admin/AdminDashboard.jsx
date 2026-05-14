@@ -9,13 +9,13 @@ import {
   Menu,
   Leaf,
   LayoutGrid,
-  Layers, // Structure සඳහා අලුත් Icon එක
+  Layers, // New icon for Structure
 } from "lucide-react";
 
 // Imports
 import ManageCrops from "./ManageCrops";
 import UpdatePrices from "./UpdatePrices";
-import ManageStructure from "./ManageStructure"; // අලුත් පේජ් එක Import කළා
+import ManageStructure from "./ManageStructure"; // Imported new page
 
 const AdminDashboard = () => {
   const { logout } = useContext(AuthContext);
@@ -66,7 +66,7 @@ const AdminDashboard = () => {
             label="Update Prices"
           />
 
-          {/* --- අලුත් "Manage Structures" Tab එක --- */}
+          {/* --- New "Manage Structures" Tab --- */}
           <NavItem
             id="manage-structure"
             icon={<Layers size={20} />}
@@ -107,7 +107,7 @@ const AdminDashboard = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto">
-          {/* තෝරාගන්නා Tab එකට අනුව අදාළ Component එක Render කිරීම */}
+          {/* Render the relevant Component based on the selected Tab */}
           {activeTab === "manage-crops" && <ManageCrops />}
           {activeTab === "update-prices" && <UpdatePrices />}
           {activeTab === "manage-structure" && <ManageStructure />}

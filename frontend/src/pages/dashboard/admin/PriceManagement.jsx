@@ -7,7 +7,7 @@ const PriceManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDailyModalOpen, setIsDailyModalOpen] = useState(false);
 
-  // සාමාන්‍ය බෝගයක් ඇතුළත් කිරීමට
+  // To add a regular crop
   const [formData, setFormData] = useState({
     cropName: "",
     category: "Vegetable",
@@ -16,7 +16,7 @@ const PriceManagement = () => {
     image: "",
   });
 
-  // දිනපතා මිල update කිරීමට
+  // To update daily prices
   const [selectedCrop, setSelectedCrop] = useState(null);
   const [dailyData, setDailyData] = useState({
     date: new Date().toISOString().split("T")[0],
@@ -41,7 +41,7 @@ const PriceManagement = () => {
     }
   };
 
-  // අලුත් බෝගයක් මුලින්ම ඇතුළත් කිරීම
+  // To initially add a new crop
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -66,7 +66,7 @@ const PriceManagement = () => {
     }
   };
 
-  // දිනපතා මිල Update කිරීම (PUT Request)
+  // To update daily prices (PUT Request)
   const handleDailyUpdate = async (e) => {
     e.preventDefault();
     try {

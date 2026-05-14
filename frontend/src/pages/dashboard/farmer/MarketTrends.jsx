@@ -5,7 +5,7 @@ import { TrendingUp, CalendarDays, Activity, Calendar } from "lucide-react";
 
 const MarketTrends = () => {
   const [selectedCrop, setSelectedCrop] = useState("Capsicum");
-  // අද දිනය Default එක විදිහට දානවා (YYYY-MM-DD format එකෙන්)
+  // Setting today's date as default (in YYYY-MM-DD format)
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [isLoading, setIsLoading] = useState(false);
   const [forecastData, setForecastData] = useState([]);
@@ -16,7 +16,7 @@ const MarketTrends = () => {
       try {
         const response = await axios.post("http://localhost:5001/api/prices/market-trends", {
           cropName: selectedCrop,
-          selectedDate: selectedDate // තෝරගත්ත දවස Backend එකට යවනවා
+          selectedDate: selectedDate // Sending selected date to Backend
         });
         setForecastData(response.data);
       } catch (error) {
@@ -26,7 +26,7 @@ const MarketTrends = () => {
     };
 
     fetchTrends();
-  }, [selectedCrop, selectedDate]); // දවස වෙනස් වුණු ගමන් ආයෙත් API එක Call වෙනවා
+  }, [selectedCrop, selectedDate]); // Call API again as soon as date changes
 
   return (
     <div className="space-y-8 pb-10">

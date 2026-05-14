@@ -28,7 +28,7 @@ import ManageStructure from "./pages/dashboard/admin/ManageStructure";
 import FarmerDashboard from "./pages/dashboard/farmer/FarmerDashboard";
 import Overview from "./pages/dashboard/farmer/Overview";
 import TunnelDesign from "./pages/dashboard/farmer/TunnelDesign";
-// ProfitCalculator import එක අයින් කළා
+// Removed ProfitCalculator import
 import AgroDoctor from "./pages/dashboard/farmer/AgroDoctor";
 import ScrollToTop from "./components/layout/ScrollToTop";
 
@@ -118,7 +118,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Profit Calculator Route එක අයින් කළා */}
+      {/* Removed Profit Calculator Route */}
 
       <Route
         path="/agro-doctor"

@@ -70,16 +70,16 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // ලියාපදිංචිය සාර්ථක නම්
+        // If registration is successful
         console.log("Registration Success:", data);
         alert("Registration Successful!");
         navigate("/login");
       } else {
-        // Backend එකෙන් එන වැරදි (උදා: Email exists)
+        // Errors from Backend (e.g., Email exists)
         setError(data.message || "Registration failed. Try again.");
       }
     } catch (err) {
-      // Server එක down නම් හෝ connection වැරදි නම්
+      // If the server is down or connection is invalid
       setError(
         "Server connection failed. Please check if your backend is running.",
       );

@@ -9,19 +9,19 @@ import {
 
 const router = express.Router();
 
-// සියලුම මිල ගණන් ලබා ගැනීමට (දැන් query parameters සපෝට් කරයි)
+// To get all prices (now supports query parameters)
 router.get("/", getPrices);
 
-// අලුත් බෝගයක් පද්ධතියට ඇතුළත් කිරීමට
+// To add a new crop to the system
 router.post("/", addPrice);
 
-// පවතින බෝගයක මිල දිනපතා යාවත්කාලීන කිරීමට
+// To update the daily price of an existing crop
 router.post("/update", updateDailyPrice);
 
-// බෝගයක් මකා දැමීමට
+// To delete a crop
 router.delete("/:id", deletePrice);
 
-// ආදායම පුරෝකථනය කිරීමට (Income Forecasting)
+// To forecast income (Income Forecasting)
 router.post("/calculate-income", calculateForecastIncome);
 
 export default router;
