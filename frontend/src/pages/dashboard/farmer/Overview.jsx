@@ -200,7 +200,7 @@ const Overview = ({ onNavigate }) => {
 
       {/* --- CONTACT US SECTION --- */}
 
-      <section id="contact" className="px-6 py-24 md:px-12 bg-white">
+      <section id="overview-contact" className="px-6 py-24 md:px-12 bg-white">
         <div className="max-w-7xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-16 space-y-4">
