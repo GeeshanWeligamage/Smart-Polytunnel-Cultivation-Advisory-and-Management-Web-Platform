@@ -200,42 +200,64 @@ const Overview = ({ onNavigate }) => {
 
       {/* --- CONTACT US SECTION --- */}
 
-      <section
-        id="contact-us"
-        data-aos="fade-up"
-        className="bg-slate-900 p-12 rounded-[3rem] text-white shadow-xl shadow-slate-900/10 scroll-mt-10"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          <div className="space-y-4">
-            <h4 className="text-xl font-black mb-2 tracking-tight">
-              Get in Touch
-            </h4>
-
-            <p className="text-slate-400 text-sm font-medium leading-relaxed">
-              Have questions? We are here to help you.
+      <section id="contact" className="px-6 py-24 md:px-12 bg-white">
+        <div className="max-w-7xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">Get in Touch</h2>
+            <p className="text-slate-500 font-medium max-w-2xl mx-auto">
+              Have questions about smart polytunnels or our AI solutions? We're here to help.
             </p>
+            <div className="h-1.5 w-24 bg-emerald-500 mx-auto rounded-full"></div>
           </div>
 
-          <div className="space-y-6">
-            <ContactLink
-              icon={<Phone size={18} />}
-              title="Call Us"
-              detail="+94 11 234 5678"
-            />
+          {/* Contact Card */}
+          <div className="max-w-4xl mx-auto bg-slate-50 rounded-[3rem] p-10 md:p-14 shadow-xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden">
+            {/* Background elements for card */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-200/20 rounded-full blur-[80px]"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-200/20 rounded-full blur-[80px]"></div>
+            
+            {/* Contact Info */}
+            <div className="relative z-10 flex flex-col items-center text-center">
+              <div className="mb-12">
+                <h3 className="text-3xl font-black text-slate-900 mb-4">Contact Information</h3>
+                <p className="text-slate-500 font-medium leading-relaxed max-w-md mx-auto">
+                  Reach out to us directly, and our agronomists will get back to you as soon as possible.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 w-full">
+                <div className="flex flex-col items-center gap-4 group">
+                  <div className="w-16 h-16 rounded-[1.5rem] bg-white border border-slate-200 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+                    <Phone size={24} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Phone</p>
+                    <p className="text-lg font-bold text-slate-800">+94 77 123 4567</p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col items-center gap-4 group">
+                  <div className="w-16 h-16 rounded-[1.5rem] bg-white border border-slate-200 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+                    <Mail size={24} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Email</p>
+                    <p className="text-lg font-bold text-slate-800">info@welgrow.lk</p>
+                  </div>
+                </div>
 
-            <ContactLink
-              icon={<Mail size={18} />}
-              title="Email"
-              detail="support@smartagro.lk"
-            />
-          </div>
-
-          <div className="space-y-6">
-            <ContactLink
-              icon={<MapPin size={18} />}
-              title="Visit Us"
-              detail="No. 45, Agro Park, Colombo 07"
-            />
+                <div className="flex flex-col items-center gap-4 group">
+                  <div className="w-16 h-16 rounded-[1.5rem] bg-white border border-slate-200 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+                    <MapPin size={24} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Location</p>
+                    <p className="text-base font-bold text-slate-800 leading-tight">No 45, Agrarian Road,<br/>Nuwara Eliya</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -263,18 +285,6 @@ const ServiceCard = ({ icon, title, desc, color, ...props }) => (
   </div>
 );
 
-const ContactLink = ({ icon, title, detail }) => (
-  <div className="flex items-center gap-4 hover:-translate-y-0.5 transition-transform cursor-pointer">
-    <div className="p-3 bg-slate-800 rounded-2xl text-emerald-500">{icon}</div>
 
-    <div>
-      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">
-        {title}
-      </p>
-
-      <p className="text-sm font-black text-white">{detail}</p>
-    </div>
-  </div>
-);
 
 export default Overview;

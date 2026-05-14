@@ -13,6 +13,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
 from collections import Counter
+import matplotlib.pyplot as plt  # <--- අලුතින් එකතු කළා
 
 # ── Configuration ────────────────────────────────────────────────────────────
 BASE_DIR         = os.path.dirname(__file__)
@@ -112,6 +113,12 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.classifier.parameters(), lr=LEARNING_RATE)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.5)
 
+# ප්‍රස්තාර අඳින්න Data එකතු කරගන්න හිස් Lists හදාගැනීම
+history_train_loss = []
+history_val_loss = []
+history_train_acc = []
+history_val_acc = []
+
 # ── Training Loop ─────────────────────────────────────────────────────────────
 print(f"[TRAIN] Starting training for up to {NUM_EPOCHS} epochs ...\n")
 best_val_acc      = 0.0
@@ -164,6 +171,12 @@ for epoch in range(NUM_EPOCHS):
     val_acc  = 100.0 * val_correct / val_total
     val_loss = val_loss_sum / len(val_loader)
     elapsed  = time.time() - t0
+    
+    # හැම Epoch එකක් ඉවර වුණාම Lists වලට Data දාගැනීම
+    history_train_loss.append(train_loss)
+    history_val_loss.append(val_loss)
+    history_train_acc.append(train_acc)
+    history_val_acc.append(val_acc)
 
     print(f"\n[EPOCH {epoch+1}/{NUM_EPOCHS}] ({elapsed:.1f}s)")
     print(f"   Train  Loss: {train_loss:.4f}  Acc: {train_acc:.2f}%")
@@ -191,3 +204,35 @@ print(f"       Best Val Accuracy : {best_val_acc:.2f}%")
 print(f"       Model saved       : {MODEL_SAVE_PATH}")
 print(f"       Classes saved     : {CLASSES_SAVE_PATH}")
 print("=" * 55)
+
+# ── ප්‍රස්තාර (Graphs) ඇඳීම සහ Save කිරීම ─────────────────────────────────────
+print("\n[INFO] Generating Accuracy and Loss Graphs...")
+graphs_dir = os.path.dirname(MODEL_SAVE_PATH)
+
+# 1. Loss Graph
+plt.figure(figsize=(10, 5))
+plt.plot(history_train_loss, label='Training Loss', color='red', marker='o')
+plt.plot(history_val_loss, label='Validation Loss', color='orange', marker='s')
+plt.title('MobileNetV2: Model Loss over Epochs')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.grid(True)
+loss_graph_path = os.path.join(graphs_dir, 'loss_graph.png')
+plt.savefig(loss_graph_path)
+plt.close()
+
+# 2. Accuracy Graph
+plt.figure(figsize=(10, 5))
+plt.plot(history_train_acc, label='Training Accuracy', color='blue', marker='o')
+plt.plot(history_val_acc, label='Validation Accuracy', color='green', marker='s')
+plt.title('MobileNetV2: Model Accuracy over Epochs')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy (%)')
+plt.legend()
+plt.grid(True)
+acc_graph_path = os.path.join(graphs_dir, 'accuracy_graph.png')
+plt.savefig(acc_graph_path)
+plt.close()
+
+print(f"[OK] Graphs saved successfully to:\n  → {loss_graph_path}\n  → {acc_graph_path}\n")

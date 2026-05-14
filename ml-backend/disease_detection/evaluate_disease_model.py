@@ -7,10 +7,10 @@ from torch.utils.data import DataLoader
 
 # Configuration
 DATASET_DIR = os.path.join(os.path.dirname(__file__), 'dataset', 'test')
-MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'tomato_disease_model.pth')
-CLASSES_PATH = os.path.join(os.path.dirname(__file__), 'models', 'tomato_disease_classes.json')
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'plant_disease_model.pth')
+CLASSES_PATH = os.path.join(os.path.dirname(__file__), 'models', 'plant_disease_classes.json')
 IMAGE_SIZE = 224
-BATCH_SIZE = 64
+BATCH_SIZE = 64 
 
 print("Loading settings...")
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -35,10 +35,34 @@ val_transform = transforms.Compose([
 # Load dataset
 print("Loading dataset...")
 full_dataset = datasets.ImageFolder(root=DATASET_DIR, transform=val_transform)
-
-# We want to test on the entire dataset (or just validation if you had a separate folder)
-# Here we will just test on a subset to show accuracy quickly.
 test_loader = DataLoader(full_dataset, batch_size=BATCH_SIZE, shuffle=False)
+
+# ==========================================
+# NEW: DEBUGGING & LABEL MAPPING FIX
+# ==========================================
+test_classes = full_dataset.classes
+
+print("\n--- DEBUG INFO: CLASS MATCHING ---")
+print("Classes in JSON (Trained) :", class_names)
+print("Classes in Test Folder    :", test_classes)
+print("----------------------------------\n")
+
+# Create a mapping from Test Folder Index to JSON (Model) Index
+idx_mapping = {}
+mapping_error = False
+
+for test_idx, class_name in enumerate(test_classes):
+    try:
+        model_idx = class_names.index(class_name)
+        idx_mapping[test_idx] = model_idx
+    except ValueError:
+        print(f"⚠️ WARNING: Folder name '{class_name}' is NOT in your JSON file!")
+        mapping_error = True
+
+if mapping_error:
+    print("\n❌ Error: Folder names in 'dataset/test' must perfectly match the names in your JSON file.")
+    print("Please rename your test folders to match the JSON list and try again.")
+    exit()
 
 # Build Model structure
 print("Building model architecture...")
@@ -64,13 +88,16 @@ total = 0
 
 with torch.no_grad():
     for i, (images, labels) in enumerate(test_loader):
-        images, labels = images.to(device), labels.to(device)
+        images = images.to(device)
+        
+        # FIX: Map the incorrect test folder labels to the correct model labels
+        mapped_labels = torch.tensor([idx_mapping[lbl.item()] for lbl in labels]).to(device)
         
         outputs = model(images)
         _, predicted = torch.max(outputs, 1)
         
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
+        total += mapped_labels.size(0)
+        correct += (predicted == mapped_labels).sum().item()
         
         # Print progress every 10 batches
         if (i + 1) % 10 == 0:
@@ -79,7 +106,7 @@ with torch.no_grad():
 accuracy = 100.0 * correct / total
 
 print("\n" + "="*50)
-print("             EVALUATION REPORT")
+print("            EVALUATION REPORT")
 print("="*50)
 print(f"Total Images Tested : {total}")
 print(f"Correct Predictions : {correct}")
